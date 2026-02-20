@@ -7,6 +7,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   
   <style>
+    /* Variables y Base original */
     :root {
       --music-pink: #ff2d55;
       --bg-overlay: rgba(242, 242, 247, 0.25);
@@ -23,51 +24,48 @@
       --sub-text: rgba(255, 255, 255, 0.5);
     }
     body { 
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; 
       margin: 0; padding: 0; min-height: 100vh;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       color: var(--text); overflow: hidden;
     }
+
+    /* Fondo blur y overlay */
     .custom-bg {
-      position: fixed; top: -30px; left: -30px; right: -30px;
-      bottom: -30px; 
+      position: fixed; top: -30px; left: -30px; right: -30px; bottom: -30px; 
       background-image: url('fondo.jpg'); background-size: cover;
       background-position: center; filter: blur(10px); z-index: -2;
     }
     .bg-overlay {
-      position: fixed; top: 0; left: 0; width: 100%;
-      height: 100%;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: var(--bg-overlay); z-index: -1; transition: background 0.5s ease;
     }
-    
-    /* BOTONES SUPERIORES ACOMODADOS */
+
+    /* Controles Superiores Acomodados */
     .top-controls {
       display: flex; justify-content: space-between; align-items: center; 
       width: 85%; max-width: 350px; margin-bottom: 20px; z-index: 10;
     }
     .btn-top {
-      background: var(--glass);
-      border: 1px solid var(--border); 
-      width: 50px; height: 50px; border-radius: 50%; 
-      cursor: pointer; 
+      background: var(--glass); border: 1px solid var(--border); 
+      width: 50px; height: 50px; border-radius: 50%; cursor: pointer; 
       backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-      transition: transform 0.2s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s ease;
     }
     .btn-top:active { transform: scale(0.92); }
     .btn-top svg { fill: var(--text); }
-    
+
+    /* Contenedor principal cristal */
     .contenedor {
-      background: var(--glass);
-      backdrop-filter: blur(35px) saturate(180%);
+      background: var(--glass); backdrop-filter: blur(35px) saturate(180%);
       -webkit-backdrop-filter: blur(35px) saturate(180%);
       border: 1px solid var(--border); border-radius: 40px;
-      padding: 35px 25px; width: 85%; max-width: 350px;
-      text-align: center;
+      padding: 35px 25px; width: 85%; max-width: 350px; text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
-    
-    /* SECCIÓN PERFIL KETSU */
+
+    /* Sección Perfil Ketsu */
     .profile-section { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
     .profile-pic {
       width: 80px; height: 80px; border-radius: 50%;
@@ -78,41 +76,37 @@
 
     h1 { font-size: 28px; font-weight: 800; letter-spacing: -1.5px; margin: 0; }
     
+    /* Zona de carga */
     .drop-zone {
       background: rgba(128,128,128,0.05); border: 1px dashed var(--sub-text);
-      border-radius: 30px;
-      padding: 45px 20px; cursor: pointer; display: block; margin-top: 20px;
+      border-radius: 30px; padding: 45px 20px; cursor: pointer; display: block; margin-top: 20px;
       transition: transform 0.2s;
     }
     .drop-zone:active { transform: scale(0.98); }
-    #status { font-size: 11px; color: var(--music-pink);
-      margin-top: 20px; font-weight: 800; }
+    #status { font-size: 11px; color: var(--music-pink); margin-top: 20px; font-weight: 800; }
     #saveBtn {
-      background: var(--music-pink); color: #ffffff;
-      border: none; padding: 18px; border-radius: 24px; 
+      background: var(--music-pink); color: #ffffff; border: none; padding: 18px; border-radius: 24px; 
       width: 100%; font-weight: 800; margin-top: 20px; display: none; cursor: pointer;
     }
-    
+
+    /* Reproductor minimalista */
     .mini-player {
       margin-top: 20px; background: var(--glass); border-radius: 30px;
-      padding: 18px 25px;
-      width: 85%; max-width: 350px; border: 1px solid var(--border);
+      padding: 18px 25px; width: 85%; max-width: 350px; border: 1px solid var(--border);
       display: flex; justify-content: space-between; align-items: center; 
-      backdrop-filter: blur(35px) saturate(180%);
-      -webkit-backdrop-filter: blur(35px) saturate(180%);
+      backdrop-filter: blur(35px) saturate(180%); -webkit-backdrop-filter: blur(35px) saturate(180%);
     }
-
-    /* BOTONES MINIMALISTAS SVG */
+    .controls { display: flex; align-items: center; gap: 15px; }
     .btn-svg { background: none; border: none; padding: 5px; cursor: pointer; display: flex; align-items: center; }
     .btn-svg svg { fill: var(--text); width: 22px; height: 22px; }
     #btnPlay svg { width: 32px; height: 32px; }
 
+    /* Redes sociales */
     .social-bar { margin-top: 20px; display: flex; gap: 12px; width: 85%; max-width: 350px; }
     .social-btn {
       flex: 1; background: var(--glass); border: 1px solid var(--border);
-      padding: 14px; border-radius: 22px;
-      text-decoration: none; color: var(--text); font-size: 13px; font-weight: 700;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 14px; border-radius: 22px; text-decoration: none; color: var(--text); 
+      font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;
     }
   </style>
 </head>
@@ -130,7 +124,7 @@
 
 <div class="contenedor">
   <div class="profile-section">
-    <img src="perfil.jpg" alt="Ketsu" class="profile-pic" onerror="this.src='https://via.placeholder.com/150/ff2d55/ffffff?text=K'">
+    <img src="Perfil.jpg" alt="Ketsu" class="profile-pic" onerror="this.src='https://via.placeholder.com/150/ff2d55/ffffff?text=K'">
     <div class="profile-welcome">Ketsu te da la bienvenida :D</div>
   </div>
 
@@ -140,7 +134,7 @@
   </label>
   <input type="file" id="file" style="display:none;" multiple>
   <div id="status">READY</div>
-  <button id="saveBtn">DESCARGAR PACK HD</button>
+  <button id="saveBtn">DESCARGAR PACK ULTRA HD</button>
 </div>
 
 <div class="mini-player">
@@ -159,8 +153,8 @@
 </div>
 
 <script>
-  const body = document.getElementById('mainBody');
-  const audio = document.getElementById('audio');
+  /* Interfaz y Música */
+  const body = document.getElementById('mainBody'); const audio = document.getElementById('audio');
   const st = document.getElementById('status'); const sv = document.getElementById('saveBtn');
   const mIco = document.getElementById('m-ico'); const pIco = document.getElementById('p-ico');
   const pBtn = document.getElementById('btnPlay');
@@ -174,9 +168,9 @@
     audio.muted = !audio.muted;
     mIco.setAttribute('d', audio.muted ? "M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" : "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z");
   };
-  
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
   
+  /* Lógica de Fuentes (FNT/Plist) */
   const processData = (txt) => {
     let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => {
         return `{${Math.floor(parseFloat(x)/2)},${Math.floor(parseFloat(y)/2)}}`;
@@ -189,25 +183,35 @@
     return res.replace(/-uhd/gi, '-hd');
   };
 
-  const resizeHighQuality = (blob) => {
-    return new Promise((res) => {
-      const img = new Image(); const url = URL.createObjectURL(blob);
-      img.onload = () => {
-        const c = document.createElement('canvas');
-        c.width = Math.floor(img.width / 2); c.height = Math.floor(img.height / 2);
-        const ctx = c.getContext('2d');
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high'; // Calidad máxima para iconos GD
-        ctx.drawImage(img, 0, 0, c.width, c.height);
-        c.toBlob((b) => { URL.revokeObjectURL(url); res(b); }, 'image/png');
-      };
-      img.src = url;
+  /* MOTOR ULTRA HD (Aceleración por Hardware) */
+  const resizeHighQuality = async (blob) => {
+    const tempBitmap = await createImageBitmap(blob);
+    const newW = Math.floor(tempBitmap.width / 2);
+    const newH = Math.floor(tempBitmap.height / 2);
+    tempBitmap.close(); 
+
+    const hdBitmap = await createImageBitmap(blob, {
+      resizeWidth: newW,
+      resizeHeight: newH,
+      resizeQuality: 'high'
     });
+
+    const c = document.createElement('canvas');
+    c.width = newW; c.height = newH;
+    const ctx = c.getContext('2d');
+    
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(hdBitmap, 0, 0);
+    hdBitmap.close();
+
+    return new Promise(res => c.toBlob(res, 'image/png'));
   };
 
   document.getElementById('file').addEventListener('change', async function(e) {
     const files = e.target.files; if(!files.length) return;
-    const zipOut = new JSZip(); st.innerText = "PROCESANDO PACK...";
+    const zipOut = new JSZip(); st.innerText = "PROCESANDO PACK CON MOTOR ULTRA HD...";
+    
     for (let f of files) {
       if (f.name.toLowerCase().endsWith('.zip')) {
         const zipIn = await JSZip.loadAsync(f);
@@ -223,19 +227,18 @@
           } else { zipOut.file(newPath, await entry.async("blob")); }
         }
       } else {
-   
         let n = f.name.replace(/-uhd/gi, '-hd');
         if (f.name.toLowerCase().endsWith('.png')) zipOut.file(n, await resizeHighQuality(f));
         else if (f.name.toLowerCase().endsWith('.plist') || f.name.toLowerCase().endsWith('.fnt')) zipOut.file(n, processData(await f.text()));
         else zipOut.file(n, f);
       }
     }
-    st.innerText = "¡LISTO!"; sv.style.display = "block";
+    st.innerText = "¡PROCESO COMPLETADO!"; sv.style.display = "block";
     sv.onclick = async () => {
       const content = await zipOut.generateAsync({type:"blob"});
       const a = document.createElement("a");
       a.href = URL.createObjectURL(content);
-      a.download = "GD_Fix_Quality_By_Ketsu.zip"; a.click();
+      a.download = "GD_UltraHD_By_Ketsu.zip"; a.click();
     };
   });
 </script>
