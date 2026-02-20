@@ -46,19 +46,16 @@
       cursor: pointer; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
       display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }
-    .btn-top svg { fill: var(--text); }
     .contenedor {
       background: var(--glass); backdrop-filter: blur(35px) saturate(180%);
       -webkit-backdrop-filter: blur(35px) saturate(180%);
       border: 1px solid var(--border); border-radius: 40px;
       padding: 35px 25px; width: 85%; max-width: 350px; text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
     h1 { font-size: 28px; font-weight: 800; letter-spacing: -1.5px; margin: 0; }
-    .sub { color: var(--sub-text); font-size: 11px; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; }
     .drop-zone {
       background: rgba(128,128,128,0.05); border: 1px dashed var(--sub-text);
-      border-radius: 30px; padding: 45px 20px; cursor: pointer; display: block; transition: transform 0.2s;
+      border-radius: 30px; padding: 45px 20px; cursor: pointer; display: block; margin-top: 20px;
     }
     #status { font-size: 11px; color: var(--music-pink); margin-top: 20px; font-weight: 800; }
     #saveBtn {
@@ -67,21 +64,15 @@
     }
     .mini-player {
       margin-top: 20px; background: var(--glass); border-radius: 30px;
-      padding: 18px 25px; width: 85%; max-width: 350px;
-      border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
-      backdrop-filter: blur(35px) saturate(180%); box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      padding: 18px 25px; width: 85%; max-width: 350px; border: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(35px) saturate(180%);
     }
-    .controls { display: flex; align-items: center; gap: 15px; }
-    .btn-svg { background: none; border: none; padding: 5px; cursor: pointer; display: flex; }
-    .btn-svg svg { fill: var(--text); }
     .social-bar { margin-top: 20px; display: flex; gap: 12px; width: 85%; max-width: 350px; }
     .social-btn {
-      flex: 1; background: var(--glass); border: 1px solid var(--border);
-      padding: 14px; border-radius: 22px; text-decoration: none;
-      color: var(--text); font-size: 13px; font-weight: 700;
+      flex: 1; background: var(--glass); border: 1px solid var(--border); padding: 14px; border-radius: 22px;
+      text-decoration: none; color: var(--text); font-size: 13px; font-weight: 700;
       display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-    .social-icon { width: 18px; height: 18px; fill: var(--text); }
   </style>
 </head>
 <body id="mainBody">
@@ -98,10 +89,8 @@
 
 <div class="contenedor">
   <h1>Texture Porter GD!</h1>
-  <div class="sub">Ultra High Fidelity Engine</div>
-  <label for="file" class="drop-zone" id="dropLabel">
-    <svg width="40" height="40" viewBox="0 0 24 24" style="fill:var(--text); opacity:0.8; margin-bottom:10px;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-    <span style="font-weight: 600; display: block;">Importar Pack o ZIP</span>
+  <label for="file" class="drop-zone">
+    <span style="font-weight: 600;">Importar Pack o ZIP</span>
   </label>
   <input type="file" id="file" style="display:none;" multiple>
   <div id="status">READY</div>
@@ -110,59 +99,54 @@
 
 <div class="mini-player">
   <div style="text-align: left;"><span style="font-size: 14px; font-weight: 700; display: block;">menuLoop</span><span style="font-size: 12px; color: var(--music-pink);">Geometry Dash OST</span></div>
-  <div class="controls">
-    <button class="btn-svg" onclick="audio.currentTime -= 10"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg></button>
-    <button class="btn-svg" id="btnPlay"><svg width="28" height="28" viewBox="0 0 24 24"><path id="p-ico" d="M8 5v14l11-7z"/></svg></button>
-    <button class="btn-svg" onclick="audio.currentTime += 10"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg></button>
+  <div style="display: flex; gap: 15px; align-items: center;">
+    <button style="background:none; border:none; cursor:pointer;" onclick="audio.currentTime -= 10">⏪</button>
+    <button id="btnPlay" style="background:none; border:none; cursor:pointer; font-size: 24px;">▶️</button>
+    <button style="background:none; border:none; cursor:pointer;" onclick="audio.currentTime += 10">⏩</button>
   </div>
   <audio id="audio" loop src="menuLoop.mp3"></audio>
 </div>
 
 <div class="social-bar">
-  <a href="https://discord.gg/cVn3Brk3Uw" target="_blank" class="social-btn">
-    <svg class="social-icon" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg> Discord
-  </a>
-  <a href="https://www.tiktok.com/@_ketsutt" target="_blank" class="social-btn">
-    <svg class="social-icon" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg> TikTok
-  </a>
+  <a href="https://discord.gg/cVn3Brk3Uw" target="_blank" class="social-btn">Discord</a>
+  <a href="https://www.tiktok.com/@_ketsutt" target="_blank" class="social-btn">TikTok</a>
 </div>
 
 <script>
   const body = document.getElementById('mainBody'); const audio = document.getElementById('audio');
-  const pIco = document.getElementById('p-ico'); const mIco = document.getElementById('m-ico');
   const st = document.getElementById('status'); const sv = document.getElementById('saveBtn');
+  const mIco = document.getElementById('m-ico'); const pBtn = document.getElementById('btnPlay');
 
   document.getElementById('themeBtn').onclick = () => body.classList.toggle('dark-mode');
-  function playMusic() { audio.play().then(() => pIco.setAttribute('d', "M6 19h4V5H6v14zm8-14v14h4V5h-4z")).catch(()=>{}); }
-  document.getElementById('btnPlay').onclick = () => { if(audio.paused) playMusic(); else { audio.pause(); pIco.setAttribute('d', "M8 5v14l11-7z"); } };
-  document.getElementById('btnMute').onclick = () => { audio.muted = !audio.muted; };
-  document.addEventListener('click', () => { if(audio.paused) playMusic(); }, { once: true });
+  function playMusic() { audio.play().then(() => pBtn.innerText = "⏸️").catch(()=>{}); }
+  pBtn.onclick = () => { if(audio.paused) playMusic(); else { audio.pause(); pBtn.innerText = "▶️"; } };
+  document.getElementById('btnMute').onclick = () => { 
+    audio.muted = !audio.muted; 
+    mIco.setAttribute('d', audio.muted ? "M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" : "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z");
+  };
+  document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
-  const processContent = (txt) => {
+  const processData = (txt) => {
     let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => {
         return `{${Math.floor(parseFloat(x)/2)},${Math.floor(parseFloat(y)/2)}}`;
     });
-    const fields = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'padding', 'spacing', 'lineHeight', 'base', 'scaleW', 'scaleH'];
-    fields.forEach(field => {
-      const regex = new RegExp(`\\b${field}=([-+]?\\d+)\\b`, 'g');
-      res = res.replace(regex, (m, val) => `${field}=${Math.floor(parseInt(val)/2)}`);
+    const fields = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight', 'scaleW', 'scaleH'];
+    fields.forEach(f => {
+      const regex = new RegExp(`\\b${f}=([-+]?\\d+)\\b`, 'g');
+      res = res.replace(regex, (m, val) => `${f}=${Math.floor(parseInt(val)/2)}`);
     });
     return res.replace(/-uhd/gi, '-hd');
   };
 
-  const resizeImg = (blob) => {
+  const resizeHighQuality = (blob) => {
     return new Promise((res) => {
-      const img = new Image();
-      const url = URL.createObjectURL(blob);
+      const img = new Image(); const url = URL.createObjectURL(blob);
       img.onload = () => {
         const c = document.createElement('canvas');
         c.width = Math.floor(img.width / 2); c.height = Math.floor(img.height / 2);
         const ctx = c.getContext('2d');
-        
-        // CALIDAD MÁXIMA (Replica iLoveIMG / Vercel)
         ctx.imageSmoothingEnabled = true;
-        [cite_start]ctx.imageSmoothingQuality = 'high'; // Interpolación de alta calidad [cite: 22-23]
-        
+        ctx.imageSmoothingQuality = 'high'; // Calidad máxima para iconos GD
         ctx.drawImage(img, 0, 0, c.width, c.height);
         c.toBlob((b) => { URL.revokeObjectURL(url); res(b); }, 'image/png');
       };
@@ -172,39 +156,32 @@
 
   document.getElementById('file').addEventListener('change', async function(e) {
     const files = e.target.files; if(!files.length) return;
-    const zipOut = new JSZip();
-    st.innerText = "PROCESANDO CON CALIDAD HD...";
-
+    const zipOut = new JSZip(); st.innerText = "PROCESANDO PACK...";
     for (let f of files) {
       if (f.name.toLowerCase().endsWith('.zip')) {
-        try {
-          const zipIn = await JSZip.loadAsync(f);
-          for (let path in zipIn.files) {
-            const entry = zipIn.files[path];
-            if (entry.dir || path.includes('__MACOSX') || path.includes('.DS_Store')) continue;
-            
-            let newPath = path.replace(/-uhd/gi, '-hd');
-            if (path.toLowerCase().endsWith('.png')) {
-              zipOut.file(newPath, await resizeImg(await entry.async("blob")));
-            } else if (path.toLowerCase().endsWith('.plist') || path.toLowerCase().endsWith('.fnt')) {
-              zipOut.file(newPath, processContent(await entry.async("string")));
-            } else { zipOut.file(newPath, await entry.async("blob")); }
-          }
-        } catch(err) { st.innerText = "ZIP INVÁLIDO"; }
+        const zipIn = await JSZip.loadAsync(f);
+        for (let path in zipIn.files) {
+          const entry = zipIn.files[path];
+          if (entry.dir || path.includes('__MACOSX')) continue;
+          let newPath = path.replace(/-uhd/gi, '-hd');
+          if (path.toLowerCase().endsWith('.png')) {
+            zipOut.file(newPath, await resizeHighQuality(await entry.async("blob")));
+          } else if (path.toLowerCase().endsWith('.plist') || path.toLowerCase().endsWith('.fnt')) {
+            zipOut.file(newPath, processData(await entry.async("string")));
+          } else { zipOut.file(newPath, await entry.async("blob")); }
+        }
       } else {
-        let newName = f.name.replace(/-uhd/gi, '-hd');
-        if (f.name.toLowerCase().endsWith('.png')) {
-          zipOut.file(newName, await resizeImg(f));
-        } else if (f.name.toLowerCase().endsWith('.plist') || f.name.toLowerCase().endsWith('.fnt')) {
-          zipOut.file(newName, processContent(await f.text()));
-        } else { zipOut.file(newName, f); }
+        let n = f.name.replace(/-uhd/gi, '-hd');
+        if (f.name.toLowerCase().endsWith('.png')) zipOut.file(n, await resizeHighQuality(f));
+        else if (f.name.toLowerCase().endsWith('.plist') || f.name.toLowerCase().endsWith('.fnt')) zipOut.file(n, processData(await f.text()));
+        else zipOut.file(n, f);
       }
     }
-    st.innerText = "¡PROCESO COMPLETADO!"; sv.style.display = "block";
+    st.innerText = "¡LISTO!"; sv.style.display = "block";
     sv.onclick = async () => {
       const content = await zipOut.generateAsync({type:"blob"});
       const a = document.createElement("a"); a.href = URL.createObjectURL(content);
-      a.download = "Texture_Pack_HD_Calidad.zip"; a.click();
+      a.download = "GD_Fix_Quality.zip"; a.click();
     };
   });
 </script>
