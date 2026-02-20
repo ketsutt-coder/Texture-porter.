@@ -15,6 +15,7 @@
       --text: #000000;
       --sub-text: rgba(0, 0, 0, 0.6);
     }
+
     body.dark-mode {
       --bg-overlay: rgba(0, 0, 0, 0.4);
       --glass: rgba(28, 28, 30, 0.5);
@@ -22,31 +23,37 @@
       --text: #ffffff;
       --sub-text: rgba(255, 255, 255, 0.5);
     }
+
     body { 
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; 
       margin: 0; padding: 0; min-height: 100vh;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       color: var(--text); overflow: hidden;
     }
+
     .custom-bg {
       position: fixed; top: -30px; left: -30px; right: -30px; bottom: -30px; 
       background-image: url('fondo.jpg'); background-size: cover;
       background-position: center; filter: blur(10px); z-index: -2;
     }
+
     .bg-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: var(--bg-overlay); z-index: -1; transition: background 0.5s ease;
     }
+
     .top-controls {
       position: absolute; top: 20px; left: 20px; right: 20px;
       display: flex; justify-content: space-between; align-items: center; z-index: 10;
     }
+
     .btn-top {
       background: var(--glass); border: 1px solid var(--border); padding: 15px; border-radius: 50%; 
       cursor: pointer; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
       display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }
     .btn-top svg { fill: var(--text); }
+
     .contenedor {
       background: var(--glass); backdrop-filter: blur(35px) saturate(180%);
       -webkit-backdrop-filter: blur(35px) saturate(180%);
@@ -54,29 +61,30 @@
       padding: 35px 25px; width: 85%; max-width: 350px; text-align: center;
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
+
     h1 { font-size: 28px; font-weight: 800; letter-spacing: -1.5px; margin: 0; }
     .sub { color: var(--sub-text); font-size: 11px; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; }
+
     .drop-zone {
       background: rgba(128,128,128,0.05); border: 1px dashed var(--sub-text);
       border-radius: 30px; padding: 45px 20px; cursor: pointer; display: block; transition: transform 0.2s;
     }
+    
     #status { font-size: 11px; color: var(--music-pink); margin-top: 20px; font-weight: 800; }
+    
     #saveBtn {
       background: var(--music-pink); color: #ffffff; border: none; padding: 18px; border-radius: 24px; 
       width: 100%; font-weight: 800; margin-top: 20px; display: none; cursor: pointer;
     }
+
     .mini-player {
       margin-top: 20px; background: var(--glass); border-radius: 30px;
       padding: 18px 25px; width: 85%; max-width: 350px;
       border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
       backdrop-filter: blur(35px) saturate(180%); box-shadow: 0 8px 20px rgba(0,0,0,0.08);
     }
-    .controls { display: flex; align-items: center; gap: 15px; }
-    .btn-svg { background: none; border: none; padding: 5px; cursor: pointer; display: flex; }
-    .btn-svg svg { fill: var(--text); }
-    .social-bar {
-      margin-top: 20px; display: flex; gap: 12px; width: 85%; max-width: 350px;
-    }
+
+    .social-bar { margin-top: 20px; display: flex; gap: 12px; width: 85%; max-width: 350px; }
     .social-btn {
       flex: 1; background: var(--glass); border: 1px solid var(--border);
       padding: 14px; border-radius: 22px; text-decoration: none;
@@ -100,8 +108,8 @@
 
 <div class="contenedor">
   <h1>Texture Porter GD!</h1>
-  <div class="sub">Ultra Precision Fix</div>
-  <label for="file" class="drop-zone">
+  <div class="sub">PNG + PLIST + FNT Precision Fix</div>
+  <label for="file" class="drop-zone" id="dropLabel">
     <svg width="40" height="40" viewBox="0 0 24 24" style="fill:var(--text); opacity:0.8; margin-bottom:10px;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
     <span style="font-weight: 600; display: block;">Importar Archivos o ZIP</span>
   </label>
@@ -130,37 +138,40 @@
   const pIco = document.getElementById('p-ico'); const mIco = document.getElementById('m-ico');
   const st = document.getElementById('status'); const sv = document.getElementById('saveBtn');
   
-  document.getElementById('themeBtn').addEventListener('click', () => body.classList.toggle('dark-mode'));
+  document.getElementById('themeBtn').onclick = () => body.classList.toggle('dark-mode');
+  document.getElementById('btnPlay').onclick = () => { if(audio.paused) audio.play(); else audio.pause(); };
 
-  function playMusic() { audio.play().then(() => pIco.setAttribute('d', "M6 19h4V5H6v14zm8-14v14h4V5h-4z")).catch(()=>{}); }
-  document.getElementById('btnPlay').addEventListener('click', (e) => { e.stopPropagation(); if(audio.paused) playMusic(); else { audio.pause(); pIco.setAttribute('d', "M8 5v14l11-7z"); } });
-  document.getElementById('btnMute').addEventListener('click', (e) => { e.stopPropagation(); audio.muted = !audio.muted; mIco.setAttribute('d', audio.muted ? "M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" : "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"); });
-  document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
-
-  const processContent = (txt) => {
-    [span_9](start_span)// PRECISIÓN MATEMÁTICA: Usar redondeo para evitar desvíos en los iconos[span_9](end_span)
+  // PROCESAMIENTO MATEMÁTICO DE ALTA PRECISIÓN
+  const processGDText = (txt) => {
+    // Dividir coordenadas {x,y} usando floor para evitar "fugas" de textura
     let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => {
-      return `{${Math.round(parseFloat(x)/2)},${Math.round(parseFloat(y)/2)}}`;
+      return `{${Math.floor(Number(x)/2)},${Math.floor(Number(y)/2)}}`;
     });
-    // SOPORTE .FNT: Dividir valores de fuentes
+    // Dividir valores de fuentes FNT (x=100, width=50, etc)
     res = res.replace(/(x|y|width|height|xoffset|yoffset|xadvance|size|padding|spacing)=(\d+)/g, (m, attr, val) => {
-      return `${attr}=${Math.round(parseInt(val)/2)}`;
+      return `${attr}=${Math.floor(Number(val)/2)}`;
     });
     return res.replace(/-uhd/gi, '-hd');
   };
 
-  const resizeImg = (blob) => {
-    return new Promise((res) => {
+  const resizeGDImage = (blob) => {
+    return new Promise((resolve) => {
       const img = new Image();
       const url = URL.createObjectURL(blob);
       img.onload = () => {
         const c = document.createElement('canvas');
-        c.width = Math.round(img.width / 2); c.height = Math.round(img.height / 2);
+        c.width = Math.floor(img.width / 2);
+        c.height = Math.floor(img.height / 2);
         const ctx = c.getContext('2d');
-        [span_10](start_span)// EVITAR BORDES BORROSOS: Desactivar suavizado al redimensionar[span_10](end_span)
+        
+        // TRUCO CLAVE: Desactivar suavizado para que los píxeles de los iconos no se borren
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(img, 0, 0, c.width, c.height);
-        c.toBlob((b) => { URL.revokeObjectURL(url); res(b); }, 'image/png');
+        
+        c.toBlob((newBlob) => {
+          URL.revokeObjectURL(url);
+          resolve(newBlob);
+        }, 'image/png');
       };
       img.src = url;
     });
@@ -169,7 +180,7 @@
   document.getElementById('file').addEventListener('change', async function(e) {
     const files = e.target.files; if(!files.length) return;
     const zipOut = new JSZip();
-    st.innerText = "PORTEANDO CON PRECISIÓN...";
+    st.innerText = "PROCESANDO CON PRECISIÓN...";
 
     for (let f of files) {
       if (f.name.endsWith('.zip')) {
@@ -179,9 +190,9 @@
           if (entry.dir || path.includes('__MACOSX')) continue;
           let newName = path.replace(/-uhd/gi, '-hd');
           if (path.toLowerCase().endsWith('.png')) {
-            zipOut.file(newName, await resizeImg(await entry.async("blob")));
+            zipOut.file(newName, await resizeGDImage(await entry.async("blob")));
           } else if (path.toLowerCase().endsWith('.plist') || path.toLowerCase().endsWith('.fnt')) {
-            zipOut.file(newName, processContent(await entry.async("string")));
+            zipOut.file(newName, processGDText(await entry.async("string")));
           } else {
             zipOut.file(newName, await entry.async("blob"));
           }
@@ -189,20 +200,20 @@
       } else {
         let newName = f.name.replace(/-uhd/gi, '-hd');
         if (f.name.toLowerCase().endsWith('.png')) {
-          zipOut.file(newName, await resizeImg(f));
+          zipOut.file(newName, await resizeGDImage(f));
         } else if (f.name.toLowerCase().endsWith('.plist') || f.name.toLowerCase().endsWith('.fnt')) {
-          zipOut.file(newName, processContent(await f.text()));
+          zipOut.file(newName, processGDText(await f.text()));
         } else {
           zipOut.file(newName, f);
         }
       }
     }
-    st.innerText = "¡PRESIÓN CORREGIDA!"; sv.style.display = "block";
+    st.innerText = "¡TODO LISTO!"; sv.style.display = "block";
     sv.onclick = async () => {
       const content = await zipOut.generateAsync({type:"blob"});
       const a = document.createElement("a");
       a.href = URL.createObjectURL(content);
-      a.download = "GD_Perfect_Pack.zip"; a.click();
+      a.download = "GD_Fix_Precision.zip"; a.click();
     };
   });
 </script>
