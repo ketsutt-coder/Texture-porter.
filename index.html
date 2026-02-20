@@ -131,7 +131,7 @@
   </label>
   <input type="file" id="file" accept=".zip,.rar,.png,.plist" style="display:none;" multiple>
 
-  <div id="status" style="font-size: 10px; color: var(--music-pink); margin-top: 20px; font-weight: 800; letter-spacing: 0.5px; word-break: break-all;">READY</div>
+  <div id="status" style="font-size: 11px; color: var(--music-pink); margin-top: 20px; font-weight: 800; letter-spacing: 0.5px; word-break: break-all;">READY</div>
   
   <button id="saveBtn" style="background: var(--music-pink); color: #ffffff; border: none; padding: 18px; border-radius: 24px; width: 100%; font-weight: 800; margin-top: 20px; display: none; box-shadow: 0 8px 20px rgba(255, 45, 85, 0.3); font-size: 14px; letter-spacing: 1px; cursor: pointer;">
     DESCARGAR PACK HD
@@ -189,19 +189,38 @@
 
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
-  // FUNCIÓN SÚPER SEGURA PARA CELULARES (Usa Base64)
-  const resizeImageSafe = (base64Str) => {
+  // FUNCIÓN SÚPER SEGURA PARA MEMORIA MÓVIL (Con recolector de basura)
+  const resizeImageSafe = (blob) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
+      const url = URL.createObjectURL(blob); // Usamos la ruta nativa sin crashear el Base64
+      
       img.onload = () => {
-        const c = document.createElement('canvas');
-        c.width = Math.max(1, Math.round(img.width / 2));
-        c.height = Math.max(1, Math.round(img.height / 2));
-        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-        c.toBlob((blob) => resolve(blob), 'image/png');
+        try {
+          const c = document.createElement('canvas');
+          c.width = Math.max(1, Math.round(img.width / 2));
+          c.height = Math.max(1, Math.round(img.height / 2));
+          const ctx = c.getContext('2d');
+          ctx.drawImage(img, 0, 0, c.width, c.height);
+          
+          c.toBlob((newBlob) => {
+            // RECOLECTOR DE BASURA: Limpiamos absolutamente todo para no saturar la RAM
+            URL.revokeObjectURL(url);
+            img.src = "";
+            c.width = 0; c.height = 0;
+            resolve(newBlob);
+          }, 'image/png');
+        } catch (e) {
+          reject(new Error("Falta de memoria en celular"));
+        }
       };
-      img.onerror = () => reject(new Error("Error leyendo PNG"));
-      img.src = "data:image/png;base64," + base64Str;
+      
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("La imagen pesa demasiado para Safari"));
+      };
+      
+      img.src = url;
     });
   };
 
@@ -225,14 +244,15 @@
             if (fileInZip.dir) continue;
             
             let n = path.replace('-uhd', '-hd');
-            st.innerText = "Convirtiendo: " + n; // Te mostrará qué archivo está leyendo
+            st.innerText = "Trabajando: " + n;
             
-            // Pausa obligatoria para que el celular no se sature de RAM
-            await new Promise(r => setTimeout(r, 50)); 
+            // Pausa obligatoria para darle tiempo al procesador del celular de respirar
+            await new Promise(r => setTimeout(r, 100)); 
             
             if (path.toLowerCase().endsWith('.png')) {
-              const base64 = await fileInZip.async("base64");
-              const newBlob = await resizeImageSafe(base64);
+              // Extraemos el archivo en su estado original en vez de texto gigante
+              const blob = await fileInZip.async("blob");
+              const newBlob = await resizeImageSafe(blob);
               zipOut.file(n, newBlob);
             } else if (path.toLowerCase().endsWith('.plist')) {
               let txt = await fileInZip.async("string");
@@ -242,17 +262,13 @@
             }
           }
         } else {
-          // Si sube un archivo suelto .png
+          // Archivos sueltos
           let n = f.name.replace('-uhd', '-hd');
-          st.innerText = "Convirtiendo: " + n;
+          st.innerText = "Trabajando: " + n;
           if (f.name.toLowerCase().endsWith('.png')) {
-             const reader = new FileReader();
-             reader.onload = async (event) => {
-                const base64 = event.target.result.split(',')[1];
-                const newBlob = await resizeImageSafe(base64);
-                zipOut.file(n, newBlob);
-             };
-             reader.readAsDataURL(f);
+             const blob = new Blob([f], { type: f.type });
+             const newBlob = await resizeImageSafe(blob);
+             zipOut.file(n, newBlob);
           } else if (f.name.toLowerCase().endsWith('.plist')) {
             let txt = await f.text();
             zipOut.file(n, txt.replace(/\{(-?\d+),\s*(-?\d+)\}/g, (m,x,y)=>`{${Math.round(x/2)},${Math.round(y/2)}}`));
@@ -264,7 +280,6 @@
       sv.style.display = "block";
     } catch (err) {
       console.error(err);
-      // Si falla, ahora te dirá exactamente el motivo en la pantalla
       st.innerText = "ERROR: " + err.message;
     }
 
