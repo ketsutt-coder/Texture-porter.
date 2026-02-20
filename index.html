@@ -1,45 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Texture Porter GD!</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  
-  <style>
-    :root {
-      --music-pink: #ff2d55;
-      --bg-overlay: rgba(242, 242, 247, 0.25);
-      --glass: rgba(255, 255, 255, 0.45);
-      --border: rgba(255, 255, 255, 0.5);
-      --text: #000000;
-      --sub-text: rgba(0, 0, 0, 0.6);
-    }
-    body.dark-mode {
-      --bg-overlay: rgba(0, 0, 0, 0.4);
-      --glass: rgba(28, 28, 30, 0.5);
-      --border: rgba(255, 255, 255, 0.15);
-      --text: #ffffff;
-      --sub-text: rgba(255, 255, 255, 0.5);
-    }
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; 
-      margin: 0; padding: 0; min-height: 100vh;
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      color: var(--text); overflow: hidden;
-    }
-    .custom-bg {
-      position: fixed; top: -30px; left: -30px; right: -30px; bottom: -30px; 
-      background-image: url('fondo.jpg'); background-size: cover;
-      background-position: center; filter: blur(10px); z-index: -2;
-    }
-    .bg-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: var(--bg-overlay); z-index: -1; transition: background 0.5s ease;
-    }
-    .top-controls {
-      position: absolute; top: 20px; left: 20px; right: 20px;
-      display: flex; justify-content: space-between; align-items: center; z-index: 10;
+center; z-index: 10;
     }
     .btn-top {
       background: var(--glass); border: 1px solid var(--border); padding: 15px; border-radius: 50%; 
