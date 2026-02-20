@@ -161,9 +161,8 @@
       const img = new Image();
       const url = URL.createObjectURL(blob);
       img.onload = () => {
-        // SOLUCIÓN ANTI-CRASHEO GD: Redondear HACIA ARRIBA para que el Plist nunca busque píxeles fuera del límite
-        const newW = Math.max(1, Math.ceil(img.width / 2));
-        const newH = Math.max(1, Math.ceil(img.height / 2));
+        const newW = Math.max(1, Math.floor(img.width / 2));
+        const newH = Math.max(1, Math.floor(img.height / 2));
         const canvas = document.createElement('canvas');
         canvas.width = newW; canvas.height = newH;
         const ctx = canvas.getContext('2d');
@@ -185,9 +184,8 @@
   const processPlistText = (txt) => {
     let changed = txt.replace(/-uhd\./gi, '-hd.');
     changed = changed.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (match, x, y) => {
-        // Se dividen los números manteniendo hasta 2 decimales para precisión de Cocos2d
-        let newX = parseFloat((Number(x) / 2).toFixed(2));
-        let newY = parseFloat((Number(y) / 2).toFixed(2));
+        let newX = Math.floor(Number(x) / 2);
+        let newY = Math.floor(Number(y) / 2);
         return `{${newX},${newY}}`;
     });
     return changed;
@@ -210,43 +208,51 @@
           
           for (let path of filePaths) {
             current++;
-            let cleanName = path.split('/').pop(); 
-            let newName = cleanName.replace(/-uhd/gi, '-hd');
-            
-            st.innerText = `Procesando archivo ${current} de ${total}...\n${newName}`;
-            await new Promise(r => setTimeout(r, 100)); 
-            
             const fileInZip = loadedZip.files[path];
             
-            if (cleanName.toLowerCase().endsWith('.png')) {
+            // LA MAGIA: Verificamos si el archivo ES UHD. Si no lo es, lo copiamos intacto.
+            let isUHD = path.toLowerCase().includes('-uhd');
+            let newPath = isUHD ? path.replace(/-uhd/gi, '-hd') : path;
+            
+            st.innerText = `Procesando archivo ${current} de ${total}...\n${newPath}`;
+            await new Promise(r => setTimeout(r, 50)); 
+            
+            if (isUHD && path.toLowerCase().endsWith('.png')) {
+              // Solo encoge si es un PNG que dice -uhd
               const blob = await fileInZip.async("blob");
               const newBlob = await resizeImageReal(blob);
-              zipOut.file(newName, newBlob, { compression: "DEFLATE", compressionOptions: { level: 5 } });
-            } else if (cleanName.toLowerCase().endsWith('.plist')) {
+              zipOut.file(newPath, newBlob, { compression: "DEFLATE", compressionOptions: { level: 5 } });
+            } else if (isUHD && path.toLowerCase().endsWith('.plist')) {
+              // Solo modifica coordenadas si el plist dice -uhd
               let txt = await fileInZip.async("string");
-              zipOut.file(newName, processPlistText(txt), { compression: "DEFLATE" });
+              zipOut.file(newPath, processPlistText(txt), { compression: "DEFLATE" });
             } else {
-              zipOut.file(newName, await fileInZip.async("blob"));
+              // Si es un icono normal o un archivo ya en HD, LO DEJA INTACTO Y LO COPIA IGUAL
+              zipOut.file(newPath, await fileInZip.async("blob"));
             }
           }
         } else {
+          // PROCESO PARA ARCHIVOS SUELTOS
           let total = files.length;
           let current = Array.from(files).indexOf(f) + 1;
           
-          let cleanName = f.name.trim();
-          let newName = cleanName.replace(/-uhd/gi, '-hd');
+          let originalName = f.name.trim();
+          let isUHD = originalName.toLowerCase().includes('-uhd');
+          let newName = isUHD ? originalName.replace(/-uhd/gi, '-hd') : originalName;
+          
           st.innerText = `Procesando ${current} de ${total}...\n${newName}`;
           
-          if (cleanName.toLowerCase().endsWith('.png')) {
+          if (isUHD && originalName.toLowerCase().endsWith('.png')) {
              const newBlob = await resizeImageReal(f);
              zipOut.file(newName, newBlob, { compression: "DEFLATE", compressionOptions: { level: 5 } });
-          } else if (cleanName.toLowerCase().endsWith('.plist')) {
+          } else if (isUHD && originalName.toLowerCase().endsWith('.plist')) {
             let txt = await f.text();
             zipOut.file(newName, processPlistText(txt), { compression: "DEFLATE" });
           } else { 
+             // Copiar tal cual si no es UHD
              zipOut.file(newName, f); 
           }
-          await new Promise(r => setTimeout(r, 100));
+          await new Promise(r => setTimeout(r, 50));
         }
       }
       
