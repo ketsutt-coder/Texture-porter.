@@ -9,9 +9,7 @@
   <style>
     :root {
       --music-pink: #ff2d55;
-      /* Capa más suave para que luzca el fondo */
       --bg-overlay: rgba(242, 242, 247, 0.25);
-      /* Tarjetas más transparentes para que pase el blur */
       --glass: rgba(255, 255, 255, 0.45);
       --border: rgba(255, 255, 255, 0.5);
       --text: #000000;
@@ -33,7 +31,6 @@
       color: var(--text); overflow: hidden;
     }
 
-    /* EL FONDO QUE TÚ DESCARGASTE */
     .custom-bg {
       position: fixed;
       top: -30px; left: -30px; right: -30px; bottom: -30px; 
@@ -67,7 +64,6 @@
 
     .contenedor {
       background: var(--glass); 
-      /* Efecto Blur interno para la tarjeta */
       backdrop-filter: blur(35px) saturate(180%);
       -webkit-backdrop-filter: blur(35px) saturate(180%);
       border: 1px solid var(--border); border-radius: 40px;
@@ -89,7 +85,6 @@
       margin-top: 20px; background: var(--glass); border-radius: 30px;
       padding: 18px 25px; width: 85%; max-width: 350px;
       border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
-      /* Efecto Blur para el reproductor */
       backdrop-filter: blur(35px) saturate(180%);
       -webkit-backdrop-filter: blur(35px) saturate(180%);
       box-shadow: 0 8px 20px rgba(0,0,0,0.08);
@@ -107,7 +102,6 @@
       padding: 14px; border-radius: 22px; text-decoration: none;
       color: var(--text); font-size: 13px; font-weight: 700;
       display: flex; align-items: center; justify-content: center; gap: 8px;
-      /* Efecto Blur para los botones sociales */
       backdrop-filter: blur(25px);
       -webkit-backdrop-filter: blur(25px);
       box-shadow: 0 4px 15px rgba(0,0,0,0.05);
@@ -133,12 +127,15 @@
 
   <label for="file" class="drop-zone" id="dropLabel">
     <svg width="40" height="40" viewBox="0 0 24 24" style="fill:var(--text); opacity:0.8; margin-bottom:10px;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-    <span style="font-weight: 600; display: block;">Importar Pack</span>
+    <span style="font-weight: 600; display: block;">Importar Archivos o ZIP</span>
   </label>
   <input type="file" id="file" accept=".zip,.rar,.png,.plist" style="display:none;" multiple>
 
-  <div id="status" style="font-size: 10px; color: var(--music-pink); margin-top: 20px; font-weight: 700;">READY</div>
-  <button id="saveBtn" style="background: var(--text); color: var(--bg-color); border: none; padding: 18px; border-radius: 24px; width: 100%; font-weight: 700; margin-top: 20px; display: none; backdrop-filter: blur(10px);">SAVE HD PACK</button>
+  <div id="status" style="font-size: 11px; color: var(--music-pink); margin-top: 20px; font-weight: 800; letter-spacing: 0.5px;">READY</div>
+  
+  <button id="saveBtn" style="background: var(--music-pink); color: #ffffff; border: none; padding: 18px; border-radius: 24px; width: 100%; font-weight: 800; margin-top: 20px; display: none; box-shadow: 0 8px 20px rgba(255, 45, 85, 0.3); font-size: 14px; letter-spacing: 1px; cursor: pointer;">
+    DESCARGAR PACK HD
+  </button>
 </div>
 
 <div class="mini-player">
@@ -192,30 +189,69 @@
 
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
+  // LÓGICA DE PORTEO MEJORADA (LEE ARCHIVOS ZIP Y LOS CONVIERTE)
   document.getElementById('file').addEventListener('change', async function(e) {
     const files = e.target.files; if(!files.length) return;
     const st = document.getElementById('status');
     const sv = document.getElementById('saveBtn');
     document.getElementById('dropLabel').style.display = "none";
-    st.innerText = "PROCESSING...";
-    const zip = new JSZip();
-    for (let f of files) {
-      let n = f.name.replace('-uhd', '-hd');
-      if (f.name.endsWith('.png')) {
-        const img = await createImageBitmap(f);
-        const c = document.createElement('canvas');
-        c.width = Math.round(img.width/2); c.height = Math.round(img.height/2);
-        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-        zip.file(n, await new Promise(r => c.toBlob(r)));
-      } else if (f.name.endsWith('.plist')) {
-        zip.file(n, (await f.text()).replace(/\{(-?\d+),\s*(-?\d+)\}/g, (m,x,y)=>`{${Math.round(x/2)},${Math.round(y/2)}}`));
-      } else { zip.file(f.name, f); }
+    st.innerText = "PROCESANDO... (Puede tardar)";
+    
+    const zipOut = new JSZip();
+
+    try {
+      for (let f of files) {
+        if (f.name.toLowerCase().endsWith('.zip')) {
+          // Extraer y procesar todo dentro del ZIP
+          const loadedZip = await JSZip.loadAsync(f);
+          for (let path in loadedZip.files) {
+            const fileInZip = loadedZip.files[path];
+            if (fileInZip.dir) continue;
+            let n = path.replace('-uhd', '-hd');
+            
+            if (path.toLowerCase().endsWith('.png')) {
+              const blob = await fileInZip.async("blob");
+              const img = await createImageBitmap(blob);
+              const c = document.createElement('canvas');
+              c.width = Math.max(1, Math.round(img.width/2));
+              c.height = Math.max(1, Math.round(img.height/2));
+              c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+              zipOut.file(n, await new Promise(r => c.toBlob(r)));
+            } else if (path.toLowerCase().endsWith('.plist')) {
+              let txt = await fileInZip.async("text");
+              zipOut.file(n, txt.replace(/\{(-?\d+),\s*(-?\d+)\}/g, (m,x,y)=>`{${Math.round(x/2)},${Math.round(y/2)}}`));
+            } else {
+              zipOut.file(n, await fileInZip.async("blob"));
+            }
+          }
+        } else {
+          // Procesar archivos sueltos
+          let n = f.name.replace('-uhd', '-hd');
+          if (f.name.toLowerCase().endsWith('.png')) {
+            const img = await createImageBitmap(f);
+            const c = document.createElement('canvas');
+            c.width = Math.max(1, Math.round(img.width/2));
+            c.height = Math.max(1, Math.round(img.height/2));
+            c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+            zipOut.file(n, await new Promise(r => c.toBlob(r)));
+          } else if (f.name.toLowerCase().endsWith('.plist')) {
+            zipOut.file(n, (await f.text()).replace(/\{(-?\d+),\s*(-?\d+)\}/g, (m,x,y)=>`{${Math.round(x/2)},${Math.round(y/2)}}`));
+          } else { zipOut.file(n, f); }
+        }
+      }
+      st.innerText = "¡TODO LISTO!"; 
+      sv.style.display = "block";
+    } catch (err) {
+      console.error(err);
+      st.innerText = "ERROR AL CONVERTIR";
     }
-    st.innerText = "COMPLETE"; sv.style.display = "block";
+
     sv.onclick = async () => {
-      const b = await zip.generateAsync({type:"blob"});
+      st.innerText = "GUARDANDO...";
+      const b = await zipOut.generateAsync({type:"blob"});
       const a = document.createElement('a'); a.href = URL.createObjectURL(b);
       a.download = "Texture_Pack_HD.zip"; a.click();
+      st.innerText = "¡DESCARGADO!";
     };
   });
 </script>
