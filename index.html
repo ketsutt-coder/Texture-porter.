@@ -15,6 +15,7 @@
       --text: #000000;
       --sub-text: rgba(0, 0, 0, 0.6);
     }
+
     body.dark-mode {
       --bg-overlay: rgba(0, 0, 0, 0.4);
       --glass: rgba(28, 28, 30, 0.5);
@@ -22,31 +23,37 @@
       --text: #ffffff;
       --sub-text: rgba(255, 255, 255, 0.5);
     }
+
     body { 
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; 
       margin: 0; padding: 0; min-height: 100vh;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       color: var(--text); overflow: hidden;
     }
+
     .custom-bg {
       position: fixed; top: -30px; left: -30px; right: -30px; bottom: -30px; 
       background-image: url('fondo.jpg'); background-size: cover;
       background-position: center; filter: blur(10px); z-index: -2;
     }
+
     .bg-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: var(--bg-overlay); z-index: -1; transition: background 0.5s ease;
     }
+
     .top-controls {
       position: absolute; top: 20px; left: 20px; right: 20px;
       display: flex; justify-content: space-between; align-items: center; z-index: 10;
     }
+
     .btn-top {
       background: var(--glass); border: 1px solid var(--border); padding: 15px; border-radius: 50%; 
       cursor: pointer; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
       display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }
     .btn-top svg { fill: var(--text); }
+
     .contenedor {
       background: var(--glass); backdrop-filter: blur(35px) saturate(180%);
       -webkit-backdrop-filter: blur(35px) saturate(180%);
@@ -54,25 +61,32 @@
       padding: 35px 25px; width: 85%; max-width: 350px; text-align: center;
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
+
     h1 { font-size: 28px; font-weight: 800; letter-spacing: -1.5px; margin: 0; }
+    .sub { color: var(--sub-text); font-size: 11px; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; }
+
     .drop-zone {
       background: rgba(128,128,128,0.05); border: 1px dashed var(--sub-text);
-      border-radius: 30px; padding: 45px 20px; cursor: pointer; display: block; margin-top: 20px;
+      border-radius: 30px; padding: 45px 20px; cursor: pointer; display: block; transition: transform 0.2s;
     }
+    
     #status { font-size: 11px; color: var(--music-pink); margin-top: 20px; font-weight: 800; }
+    
     #saveBtn {
       background: var(--music-pink); color: #ffffff; border: none; padding: 18px; border-radius: 24px; 
       width: 100%; font-weight: 800; margin-top: 20px; display: none; cursor: pointer;
     }
+
     .mini-player {
       margin-top: 20px; background: var(--glass); border-radius: 30px;
       padding: 18px 25px; width: 85%; max-width: 350px;
       border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
-      backdrop-filter: blur(35px) saturate(180%);
+      backdrop-filter: blur(35px) saturate(180%); box-shadow: 0 8px 20px rgba(0,0,0,0.08);
     }
     .controls { display: flex; align-items: center; gap: 15px; }
     .btn-svg { background: none; border: none; padding: 5px; cursor: pointer; display: flex; }
     .btn-svg svg { fill: var(--text); }
+
     .social-bar { margin-top: 20px; display: flex; gap: 12px; width: 85%; max-width: 350px; }
     .social-btn {
       flex: 1; background: var(--glass); border: 1px solid var(--border);
@@ -97,9 +111,9 @@
 
 <div class="contenedor">
   <h1>Texture Porter GD!</h1>
+  <div class="sub">Vercel Precision Engine</div>
   <label for="file" class="drop-zone" id="dropLabel">
-    <svg width="40" height="40" viewBox="0 0 24 24" style="fill:var(--text); opacity:0.8; margin-bottom:10px;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-    <span style="font-weight: 600; display: block;">Importar Pack o ZIP</span>
+    <span>Importar Pack o ZIP</span>
   </label>
   <input type="file" id="file" style="display:none;" multiple>
   <div id="status">READY</div>
@@ -130,16 +144,15 @@
   function playMusic() { audio.play().then(() => pIco.setAttribute('d', "M6 19h4V5H6v14zm8-14v14h4V5h-4z")).catch(()=>{}); }
   document.getElementById('btnPlay').onclick = () => { if(audio.paused) playMusic(); else { audio.pause(); pIco.setAttribute('d', "M8 5v14l11-7z"); } };
   document.getElementById('btnMute').onclick = () => { audio.muted = !audio.muted; };
-  document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
+  document.addEventListener('click', () => { if(audio.paused) playMusic(); }, { once: true });
 
-  [span_4](start_span)[span_5](start_span)[span_6](start_span)// MOTOR CLONADO DE ALTA PRECISIÓN[span_4](end_span)[span_5](end_span)[span_6](end_span)
-  const processGDData = (txt) => {
-    [span_7](start_span)// 1. Redimensionar coordenadas {x,y} con precisión de suelo[span_7](end_span)
+  const processContent = (txt) => {
+    // Redimensionar coordenadas entre llaves {x,y}
     let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => {
         return `{${Math.floor(parseFloat(x)/2)},${Math.floor(parseFloat(y)/2)}}`;
     });
-    [span_8](start_span)[span_9](start_span)// 2. Escalar campos de fuentes .fnt línea por línea (idéntico a Vercel)[span_8](end_span)[span_9](end_span)
-    const fields = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight'];
+    // Redimensionar valores de fuentes .fnt (x,y,width,height,offsets,advance, etc)
+    const fields = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'padding', 'spacing', 'lineHeight', 'base', 'scaleW', 'scaleH'];
     fields.forEach(field => {
       const regex = new RegExp(`\\b${field}=([-+]?\\d+)\\b`, 'g');
       res = res.replace(regex, (m, val) => `${field}=${Math.floor(parseInt(val)/2)}`);
@@ -155,8 +168,7 @@
         const c = document.createElement('canvas');
         c.width = Math.floor(img.width / 2); c.height = Math.floor(img.height / 2);
         const ctx = c.getContext('2d');
-        [span_10](start_span)// SIN SUAVIZADO: Mantiene los píxeles nítidos y duros (Estilo Vercel/GD)[span_10](end_span)
-        ctx.imageSmoothingEnabled = false;
+        ctx.imageSmoothingEnabled = false; // Sin suavizado para mantener calidad pixelada original
         ctx.drawImage(img, 0, 0, c.width, c.height);
         c.toBlob((b) => { URL.revokeObjectURL(url); res(b); }, 'image/png');
       };
@@ -167,35 +179,38 @@
   document.getElementById('file').addEventListener('change', async function(e) {
     const files = e.target.files; if(!files.length) return;
     const zipOut = new JSZip();
-    st.innerText = "CLONANDO MOTOR DE PRECISIÓN...";
+    st.innerText = "PROCESANDO PACK...";
 
     for (let f of files) {
-      if (f.name.endsWith('.zip')) {
-        const zipIn = await JSZip.loadAsync(f);
-        for (let path in zipIn.files) {
-          const entry = zipIn.files[path];
-          if (entry.dir || path.includes('__MACOSX')) continue;
-          let newPath = path.replace(/-uhd/gi, '-hd');
-          if (path.toLowerCase().endsWith('.png')) {
-            zipOut.file(newPath, await resizeImg(await entry.async("blob")));
-          } else if (path.toLowerCase().endsWith('.plist') || path.toLowerCase().endsWith('.fnt')) {
-            zipOut.file(newPath, processGDData(await entry.async("string")));
-          } else { zipOut.file(newPath, await entry.async("blob")); }
-        }
+      if (f.name.toLowerCase().endsWith('.zip')) {
+        try {
+          const zipIn = await JSZip.loadAsync(f);
+          for (let path in zipIn.files) {
+            const entry = zipIn.files[path];
+            if (entry.dir || path.includes('__MACOSX') || path.includes('.DS_Store')) continue;
+            
+            let newPath = path.replace(/-uhd/gi, '-hd');
+            if (path.toLowerCase().endsWith('.png')) {
+              zipOut.file(newPath, await resizeImg(await entry.async("blob")));
+            } else if (path.toLowerCase().endsWith('.plist') || path.toLowerCase().endsWith('.fnt')) {
+              zipOut.file(newPath, processContent(await entry.async("string")));
+            } else { zipOut.file(newPath, await entry.async("blob")); }
+          }
+        } catch(err) { st.innerText = "ZIP INVÁLIDO"; }
       } else {
         let newName = f.name.replace(/-uhd/gi, '-hd');
         if (f.name.toLowerCase().endsWith('.png')) {
           zipOut.file(newName, await resizeImg(f));
         } else if (f.name.toLowerCase().endsWith('.plist') || f.name.toLowerCase().endsWith('.fnt')) {
-          zipOut.file(newName, processGDData(await f.text()));
+          zipOut.file(newName, processContent(await f.text()));
         } else { zipOut.file(newName, f); }
       }
     }
-    st.innerText = "¡TODO LISTO CON PRECISIÓN MÁXIMA!"; sv.style.display = "block";
+    st.innerText = "¡TODO LISTO!"; sv.style.display = "block";
     sv.onclick = async () => {
       const content = await zipOut.generateAsync({type:"blob"});
       const a = document.createElement("a"); a.href = URL.createObjectURL(content);
-      a.download = "GD_Perfect_Port.zip"; a.click();
+      a.download = "Texture_Pack_HD.zip"; a.click();
     };
   });
 </script>
