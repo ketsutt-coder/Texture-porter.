@@ -209,17 +209,30 @@
             resolve(newBlob);
           }, 'image/png');
         } catch (e) {
-          reject(new Error("Falta de memoria en celular"));
+          reject(new Error("Límite de memoria del celular superado. Usa PC."));
         }
       };
       
       img.onerror = () => {
         URL.revokeObjectURL(url);
-        reject(new Error("La imagen pesa demasiado para Safari"));
+        reject(new Error("Imagen demasiado grande para este celular."));
       };
-      
       img.src = url;
     });
+  };
+
+  // NUEVA LÓGICA DE PLIST INFALIBLE
+  const processPlist = (txt) => {
+    // 1. Cambiar el nombre del archivo interno (.png)
+    let result = txt.replace(/-uhd\.png/gi, '-hd.png');
+    
+    // 2. Dividir absolutamente todos los números y coordenadas a la mitad
+    result = result.replace(/\{(-?\d*\.?\d+),\s*(-?\d*\.?\d+)\}/g, (match, x, y) => {
+        let newX = Math.round(parseFloat(x) / 2);
+        let newY = Math.round(parseFloat(y) / 2);
+        return `{${newX},${newY}}`;
+    });
+    return result;
   };
 
   document.getElementById('file').addEventListener('change', async function(e) {
@@ -243,7 +256,6 @@
             
             let n = path.replace('-uhd', '-hd');
             st.innerText = "Trabajando: " + n;
-            
             await new Promise(r => setTimeout(r, 100)); 
             
             if (path.toLowerCase().endsWith('.png')) {
@@ -252,13 +264,12 @@
               zipOut.file(n, newBlob);
             } else if (path.toLowerCase().endsWith('.plist')) {
               let txt = await fileInZip.async("string");
-              zipOut.file(n, txt.replace(/\{(-?\d+),\s*(-?\d+)\}/g, (m,x,y)=>`{${Math.round(x/2)},${Math.round(y/2)}}`));
+              zipOut.file(n, processPlist(txt));
             } else {
               zipOut.file(n, await fileInZip.async("blob"));
             }
           }
         } else {
-          // Archivos sueltos
           let n = f.name.replace('-uhd', '-hd');
           st.innerText = "Trabajando: " + n;
           if (f.name.toLowerCase().endsWith('.png')) {
@@ -267,7 +278,7 @@
              zipOut.file(n, newBlob);
           } else if (f.name.toLowerCase().endsWith('.plist')) {
             let txt = await f.text();
-            zipOut.file(n, txt.replace(/\{(-?\d+),\s*(-?\d+)\}/g, (m,x,y)=>`{${Math.round(x/2)},${Math.round(y/2)}}`));
+            zipOut.file(n, processPlist(txt));
           } else { zipOut.file(n, f); }
         }
       }
