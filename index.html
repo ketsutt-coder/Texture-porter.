@@ -131,7 +131,7 @@
   </label>
   <input type="file" id="file" accept=".zip,.rar,.png,.plist" style="display:none;" multiple>
 
-  <div id="status" style="font-size: 11px; color: var(--music-pink); margin-top: 20px; font-weight: 800; letter-spacing: 0.5px;">READY</div>
+  <div id="status" style="font-size: 10px; color: var(--music-pink); margin-top: 20px; font-weight: 800; letter-spacing: 0.5px; word-break: break-all;">READY</div>
   
   <button id="saveBtn" style="background: var(--music-pink); color: #ffffff; border: none; padding: 18px; border-radius: 24px; width: 100%; font-weight: 800; margin-top: 20px; display: none; box-shadow: 0 8px 20px rgba(255, 45, 85, 0.3); font-size: 14px; letter-spacing: 1px; cursor: pointer;">
     DESCARGAR PACK HD
@@ -189,23 +189,19 @@
 
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
-  // NUEVA FUNCIÓN A PRUEBA DE FALLOS PARA REDIMENSIONAR IMÁGENES
-  const resizeImageSafe = (blob) => {
+  // FUNCIÓN SÚPER SEGURA PARA CELULARES (Usa Base64)
+  const resizeImageSafe = (base64Str) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      const url = URL.createObjectURL(blob);
       img.onload = () => {
         const c = document.createElement('canvas');
         c.width = Math.max(1, Math.round(img.width / 2));
         c.height = Math.max(1, Math.round(img.height / 2));
         c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-        c.toBlob((newBlob) => {
-          URL.revokeObjectURL(url);
-          resolve(newBlob);
-        }, 'image/png');
+        c.toBlob((blob) => resolve(blob), 'image/png');
       };
-      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Error leyendo imagen")); };
-      img.src = url;
+      img.onerror = () => reject(new Error("Error leyendo PNG"));
+      img.src = "data:image/png;base64," + base64Str;
     });
   };
 
@@ -214,7 +210,7 @@
     const st = document.getElementById('status');
     const sv = document.getElementById('saveBtn');
     document.getElementById('dropLabel').style.display = "none";
-    st.innerText = "PROCESANDO... (No cierres la pestaña)";
+    st.innerText = "INICIANDO...";
     
     const zipOut = new JSZip();
 
@@ -229,10 +225,14 @@
             if (fileInZip.dir) continue;
             
             let n = path.replace('-uhd', '-hd');
+            st.innerText = "Convirtiendo: " + n; // Te mostrará qué archivo está leyendo
+            
+            // Pausa obligatoria para que el celular no se sature de RAM
+            await new Promise(r => setTimeout(r, 50)); 
             
             if (path.toLowerCase().endsWith('.png')) {
-              const blob = await fileInZip.async("blob");
-              const newBlob = await resizeImageSafe(blob);
+              const base64 = await fileInZip.async("base64");
+              const newBlob = await resizeImageSafe(base64);
               zipOut.file(n, newBlob);
             } else if (path.toLowerCase().endsWith('.plist')) {
               let txt = await fileInZip.async("string");
@@ -242,27 +242,34 @@
             }
           }
         } else {
-          // Archivos sueltos
+          // Si sube un archivo suelto .png
           let n = f.name.replace('-uhd', '-hd');
+          st.innerText = "Convirtiendo: " + n;
           if (f.name.toLowerCase().endsWith('.png')) {
-            const blob = new Blob([f], { type: f.type });
-            const newBlob = await resizeImageSafe(blob);
-            zipOut.file(n, newBlob);
+             const reader = new FileReader();
+             reader.onload = async (event) => {
+                const base64 = event.target.result.split(',')[1];
+                const newBlob = await resizeImageSafe(base64);
+                zipOut.file(n, newBlob);
+             };
+             reader.readAsDataURL(f);
           } else if (f.name.toLowerCase().endsWith('.plist')) {
             let txt = await f.text();
             zipOut.file(n, txt.replace(/\{(-?\d+),\s*(-?\d+)\}/g, (m,x,y)=>`{${Math.round(x/2)},${Math.round(y/2)}}`));
           } else { zipOut.file(n, f); }
         }
       }
+      
       st.innerText = "¡TODO LISTO!"; 
       sv.style.display = "block";
     } catch (err) {
       console.error(err);
-      st.innerText = "HUBO UN ERROR. RECARGA LA PÁGINA.";
+      // Si falla, ahora te dirá exactamente el motivo en la pantalla
+      st.innerText = "ERROR: " + err.message;
     }
 
     sv.onclick = async () => {
-      st.innerText = "GUARDANDO...";
+      st.innerText = "EMPAQUETANDO EL ZIP...";
       const b = await zipOut.generateAsync({type:"blob"});
       const a = document.createElement('a'); a.href = URL.createObjectURL(b);
       a.download = "Texture_Pack_HD.zip"; a.click();
