@@ -129,7 +129,7 @@
     <svg width="40" height="40" viewBox="0 0 24 24" style="fill:var(--text); opacity:0.8; margin-bottom:10px;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
     <span style="font-weight: 600; display: block;">Importar Archivos o ZIP</span>
   </label>
-  <input type="file" id="file" accept=".zip,.rar,.png,.plist" style="display:none;" multiple>
+  <input type="file" id="file" style="display:none;" multiple>
 
   <div id="status" style="font-size: 11px; color: var(--music-pink); margin-top: 20px; font-weight: 800; letter-spacing: 0.5px; word-break: break-all;">READY</div>
   
@@ -189,11 +189,10 @@
 
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
-  // FUNCIÓN SÚPER SEGURA PARA MEMORIA MÓVIL (Con recolector de basura)
   const resizeImageSafe = (blob) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      const url = URL.createObjectURL(blob); // Usamos la ruta nativa sin crashear el Base64
+      const url = URL.createObjectURL(blob); 
       
       img.onload = () => {
         try {
@@ -204,7 +203,6 @@
           ctx.drawImage(img, 0, 0, c.width, c.height);
           
           c.toBlob((newBlob) => {
-            // RECOLECTOR DE BASURA: Limpiamos absolutamente todo para no saturar la RAM
             URL.revokeObjectURL(url);
             img.src = "";
             c.width = 0; c.height = 0;
@@ -246,11 +244,9 @@
             let n = path.replace('-uhd', '-hd');
             st.innerText = "Trabajando: " + n;
             
-            // Pausa obligatoria para darle tiempo al procesador del celular de respirar
             await new Promise(r => setTimeout(r, 100)); 
             
             if (path.toLowerCase().endsWith('.png')) {
-              // Extraemos el archivo en su estado original en vez de texto gigante
               const blob = await fileInZip.async("blob");
               const newBlob = await resizeImageSafe(blob);
               zipOut.file(n, newBlob);
