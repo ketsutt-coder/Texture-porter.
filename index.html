@@ -156,17 +156,13 @@
   document.getElementById('btnMute').addEventListener('click', (e) => { e.stopPropagation(); audio.muted = !audio.muted; mIco.setAttribute('d', audio.muted ? "M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" : "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"); });
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
-  // CONVERSOR DE IMAGEN ROBUSTO QUE TE AVISA DEL TAMAÑO EXACTO
-  const resizeImageReal = (blob, fileName) => {
+  const resizeImageReal = (blob) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       const url = URL.createObjectURL(blob);
       img.onload = () => {
-        const oldW = img.width; const oldH = img.height;
-        const newW = Math.max(1, Math.floor(oldW / 2));
-        const newH = Math.max(1, Math.floor(oldH / 2));
-        
-        // Dibuja la imagen a la mitad de su tamaño real
+        const newW = Math.max(1, Math.floor(img.width / 2));
+        const newH = Math.max(1, Math.floor(img.height / 2));
         const canvas = document.createElement('canvas');
         canvas.width = newW; canvas.height = newH;
         const ctx = canvas.getContext('2d');
@@ -174,35 +170,21 @@
         
         canvas.toBlob((newBlob) => {
           URL.revokeObjectURL(url);
-          st.innerText = `ÉXITO: ${fileName}\nReducido de ${oldW}x${oldH} a ${newW}x${newH}`;
           resolve(newBlob);
         }, 'image/png');
       };
-      img.onerror = () => reject(new Error("Formato de imagen inválido"));
+      img.onerror = () => reject(new Error("Error leyendo imagen"));
       img.src = url;
     });
   };
 
-  // BUSCADOR AGRESIVO PARA PLIST
-  const processPlistText = (txt, fileName) => {
-    let original = txt;
-    // Cambiar referencias internas a -hd
+  const processPlistText = (txt) => {
     let changed = txt.replace(/-uhd\.png/gi, '-hd.png');
-    
-    // Buscar cualquier número encerrado en llaves {x,y} y cortarlo a la mitad
     changed = changed.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (match, x, y) => {
-        let newX = Number(x) / 2; let newY = Number(y) / 2;
-        // Evitar muchos decimales raros en JS
-        newX = Math.round(newX * 1000) / 1000;
-        newY = Math.round(newY * 1000) / 1000;
+        let newX = Math.round((Number(x) / 2) * 1000) / 1000;
+        let newY = Math.round((Number(y) / 2) * 1000) / 1000;
         return `{${newX},${newY}}`;
     });
-    
-    if (changed !== original) {
-      st.innerText = `ÉXITO: ${fileName}\n(Coordenadas y código divididos a la mitad)`;
-    } else {
-      st.innerText = `ADVERTENCIA: ${fileName}\nNo se encontró código UHD para dividir.`;
-    }
     return changed;
   };
 
@@ -217,59 +199,65 @@
       for (let f of files) {
         if (f.name.toLowerCase().endsWith('.zip')) {
           const loadedZip = await JSZip.loadAsync(f);
-          const filePaths = Object.keys(loadedZip.files);
+          const filePaths = Object.keys(loadedZip.files).filter(p => !loadedZip.files[p].dir && !p.includes('__MACOSX') && !p.includes('.DS_Store'));
+          let total = filePaths.length;
+          let current = 0;
           
           for (let path of filePaths) {
-            const fileInZip = loadedZip.files[path];
-            // Destruir basura de Mac OS y carpetas
-            if (fileInZip.dir || path.includes('__MACOSX') || path.includes('.DS_Store')) continue;
-            
-            let cleanName = path.split('/').pop(); // Sacar nombre real sin rutas raras
+            current++;
+            let cleanName = path.split('/').pop(); 
             let newName = cleanName.replace(/-uhd/gi, '-hd');
             
-            st.innerText = "Abriendo: " + cleanName + "...";
-            await new Promise(r => setTimeout(r, 200)); 
+            st.innerText = `Procesando archivo ${current} de ${total}...\n${newName}`;
+            await new Promise(r => setTimeout(r, 100)); // Respiro para la RAM
+            
+            const fileInZip = loadedZip.files[path];
             
             if (cleanName.toLowerCase().endsWith('.png')) {
               const blob = await fileInZip.async("blob");
-              const newBlob = await resizeImageReal(blob, newName);
-              zipOut.file(newName, newBlob);
+              const newBlob = await resizeImageReal(blob);
+              // Añadimos compresión DEFLATE para ahorrar RAM en el celular
+              zipOut.file(newName, newBlob, { compression: "DEFLATE", compressionOptions: { level: 5 } });
             } else if (cleanName.toLowerCase().endsWith('.plist')) {
               let txt = await fileInZip.async("string");
-              zipOut.file(newName, processPlistText(txt, newName));
+              zipOut.file(newName, processPlistText(txt), { compression: "DEFLATE" });
             } else {
               zipOut.file(newName, await fileInZip.async("blob"));
             }
-            await new Promise(r => setTimeout(r, 500)); // Pausa para que alcances a leer la pantalla
           }
         } else {
-          // ARCHIVOS SUELTOS
+          // Lote de archivos sueltos
+          let total = files.length;
+          let current = Array.from(files).indexOf(f) + 1;
+          
           let cleanName = f.name.trim();
           let newName = cleanName.replace(/-uhd/gi, '-hd');
-          st.innerText = "Abriendo: " + cleanName + "...";
+          st.innerText = `Procesando ${current} de ${total}...\n${newName}`;
           
           if (cleanName.toLowerCase().endsWith('.png')) {
-             const newBlob = await resizeImageReal(f, newName);
-             zipOut.file(newName, newBlob);
+             const newBlob = await resizeImageReal(f);
+             zipOut.file(newName, newBlob, { compression: "DEFLATE", compressionOptions: { level: 5 } });
           } else if (cleanName.toLowerCase().endsWith('.plist')) {
             let txt = await f.text();
-            zipOut.file(newName, processPlistText(txt, newName));
+            zipOut.file(newName, processPlistText(txt), { compression: "DEFLATE" });
           } else { 
              zipOut.file(newName, f); 
           }
+          await new Promise(r => setTimeout(r, 100));
         }
       }
       
-      st.innerText = "¡TODO PROCESADO Y REDUCIDO CORRECTAMENTE!"; 
+      st.innerText = "¡TODO PROCESADO CORRECTAMENTE!"; 
       sv.style.display = "block";
     } catch (err) {
       console.error(err);
-      st.innerText = "ERROR FATAL: " + err.message;
+      st.innerText = "LÍMITE DE MEMORIA. Intenta con menos archivos.";
     }
 
     sv.onclick = async () => {
       st.innerText = "EMPAQUETANDO, ESPERA...";
-      const b = await zipOut.generateAsync({type:"blob"});
+      await new Promise(r => setTimeout(r, 100)); // Dar tiempo a que la pantalla se actualice
+      const b = await zipOut.generateAsync({type:"blob", compression: "DEFLATE"});
       const a = document.createElement('a'); a.href = URL.createObjectURL(b);
       a.download = "Texture_Pack_HD_Escaneado.zip"; a.click();
       st.innerText = "¡DESCARGA COMPLETADA!";
