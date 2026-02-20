@@ -189,53 +189,68 @@
 
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
-  // LÓGICA DE PORTEO MEJORADA (LEE ARCHIVOS ZIP Y LOS CONVIERTE)
+  // NUEVA FUNCIÓN A PRUEBA DE FALLOS PARA REDIMENSIONAR IMÁGENES
+  const resizeImageSafe = (blob) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(blob);
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(img.width / 2));
+        c.height = Math.max(1, Math.round(img.height / 2));
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        c.toBlob((newBlob) => {
+          URL.revokeObjectURL(url);
+          resolve(newBlob);
+        }, 'image/png');
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Error leyendo imagen")); };
+      img.src = url;
+    });
+  };
+
   document.getElementById('file').addEventListener('change', async function(e) {
     const files = e.target.files; if(!files.length) return;
     const st = document.getElementById('status');
     const sv = document.getElementById('saveBtn');
     document.getElementById('dropLabel').style.display = "none";
-    st.innerText = "PROCESANDO... (Puede tardar)";
+    st.innerText = "PROCESANDO... (No cierres la pestaña)";
     
     const zipOut = new JSZip();
 
     try {
       for (let f of files) {
         if (f.name.toLowerCase().endsWith('.zip')) {
-          // Extraer y procesar todo dentro del ZIP
           const loadedZip = await JSZip.loadAsync(f);
-          for (let path in loadedZip.files) {
+          const filePaths = Object.keys(loadedZip.files);
+          
+          for (let path of filePaths) {
             const fileInZip = loadedZip.files[path];
             if (fileInZip.dir) continue;
+            
             let n = path.replace('-uhd', '-hd');
             
             if (path.toLowerCase().endsWith('.png')) {
               const blob = await fileInZip.async("blob");
-              const img = await createImageBitmap(blob);
-              const c = document.createElement('canvas');
-              c.width = Math.max(1, Math.round(img.width/2));
-              c.height = Math.max(1, Math.round(img.height/2));
-              c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-              zipOut.file(n, await new Promise(r => c.toBlob(r)));
+              const newBlob = await resizeImageSafe(blob);
+              zipOut.file(n, newBlob);
             } else if (path.toLowerCase().endsWith('.plist')) {
-              let txt = await fileInZip.async("text");
+              let txt = await fileInZip.async("string");
               zipOut.file(n, txt.replace(/\{(-?\d+),\s*(-?\d+)\}/g, (m,x,y)=>`{${Math.round(x/2)},${Math.round(y/2)}}`));
             } else {
               zipOut.file(n, await fileInZip.async("blob"));
             }
           }
         } else {
-          // Procesar archivos sueltos
+          // Archivos sueltos
           let n = f.name.replace('-uhd', '-hd');
           if (f.name.toLowerCase().endsWith('.png')) {
-            const img = await createImageBitmap(f);
-            const c = document.createElement('canvas');
-            c.width = Math.max(1, Math.round(img.width/2));
-            c.height = Math.max(1, Math.round(img.height/2));
-            c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-            zipOut.file(n, await new Promise(r => c.toBlob(r)));
+            const blob = new Blob([f], { type: f.type });
+            const newBlob = await resizeImageSafe(blob);
+            zipOut.file(n, newBlob);
           } else if (f.name.toLowerCase().endsWith('.plist')) {
-            zipOut.file(n, (await f.text()).replace(/\{(-?\d+),\s*(-?\d+)\}/g, (m,x,y)=>`{${Math.round(x/2)},${Math.round(y/2)}}`));
+            let txt = await f.text();
+            zipOut.file(n, txt.replace(/\{(-?\d+),\s*(-?\d+)\}/g, (m,x,y)=>`{${Math.round(x/2)},${Math.round(y/2)}}`));
           } else { zipOut.file(n, f); }
         }
       }
@@ -243,7 +258,7 @@
       sv.style.display = "block";
     } catch (err) {
       console.error(err);
-      st.innerText = "ERROR AL CONVERTIR";
+      st.innerText = "HUBO UN ERROR. RECARGA LA PÁGINA.";
     }
 
     sv.onclick = async () => {
