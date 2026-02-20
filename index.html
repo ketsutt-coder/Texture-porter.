@@ -161,11 +161,15 @@
       const img = new Image();
       const url = URL.createObjectURL(blob);
       img.onload = () => {
-        const newW = Math.max(1, Math.floor(img.width / 2));
-        const newH = Math.max(1, Math.floor(img.height / 2));
+        // SOLUCIÓN ANTI-CRASHEO GD: Redondear HACIA ARRIBA para que el Plist nunca busque píxeles fuera del límite
+        const newW = Math.max(1, Math.ceil(img.width / 2));
+        const newH = Math.max(1, Math.ceil(img.height / 2));
         const canvas = document.createElement('canvas');
         canvas.width = newW; canvas.height = newH;
         const ctx = canvas.getContext('2d');
+        
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, newW, newH);
         
         canvas.toBlob((newBlob) => {
@@ -179,10 +183,11 @@
   };
 
   const processPlistText = (txt) => {
-    let changed = txt.replace(/-uhd\.png/gi, '-hd.png');
+    let changed = txt.replace(/-uhd\./gi, '-hd.');
     changed = changed.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (match, x, y) => {
-        let newX = Math.round((Number(x) / 2) * 1000) / 1000;
-        let newY = Math.round((Number(y) / 2) * 1000) / 1000;
+        // Se dividen los números manteniendo hasta 2 decimales para precisión de Cocos2d
+        let newX = parseFloat((Number(x) / 2).toFixed(2));
+        let newY = parseFloat((Number(y) / 2).toFixed(2));
         return `{${newX},${newY}}`;
     });
     return changed;
@@ -209,14 +214,13 @@
             let newName = cleanName.replace(/-uhd/gi, '-hd');
             
             st.innerText = `Procesando archivo ${current} de ${total}...\n${newName}`;
-            await new Promise(r => setTimeout(r, 100)); // Respiro para la RAM
+            await new Promise(r => setTimeout(r, 100)); 
             
             const fileInZip = loadedZip.files[path];
             
             if (cleanName.toLowerCase().endsWith('.png')) {
               const blob = await fileInZip.async("blob");
               const newBlob = await resizeImageReal(blob);
-              // Añadimos compresión DEFLATE para ahorrar RAM en el celular
               zipOut.file(newName, newBlob, { compression: "DEFLATE", compressionOptions: { level: 5 } });
             } else if (cleanName.toLowerCase().endsWith('.plist')) {
               let txt = await fileInZip.async("string");
@@ -226,7 +230,6 @@
             }
           }
         } else {
-          // Lote de archivos sueltos
           let total = files.length;
           let current = Array.from(files).indexOf(f) + 1;
           
@@ -256,10 +259,10 @@
 
     sv.onclick = async () => {
       st.innerText = "EMPAQUETANDO, ESPERA...";
-      await new Promise(r => setTimeout(r, 100)); // Dar tiempo a que la pantalla se actualice
+      await new Promise(r => setTimeout(r, 100)); 
       const b = await zipOut.generateAsync({type:"blob", compression: "DEFLATE"});
       const a = document.createElement('a'); a.href = URL.createObjectURL(b);
-      a.download = "Texture_Pack_HD_Escaneado.zip"; a.click();
+      a.download = "Texture_Pack_HD_Final.zip"; a.click();
       st.innerText = "¡DESCARGA COMPLETADA!";
     };
   });
