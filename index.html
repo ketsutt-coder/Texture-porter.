@@ -1,4 +1,45 @@
-center; z-index: 10;
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Texture Porter GD!</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  
+  <style>
+    :root {
+      --music-pink: #ff2d55;
+      --bg-overlay: rgba(242, 242, 247, 0.25);
+      --glass: rgba(255, 255, 255, 0.45);
+      --border: rgba(255, 255, 255, 0.5);
+      --text: #000000;
+      --sub-text: rgba(0, 0, 0, 0.6);
+    }
+    body.dark-mode {
+      --bg-overlay: rgba(0, 0, 0, 0.4);
+      --glass: rgba(28, 28, 30, 0.5);
+      --border: rgba(255, 255, 255, 0.15);
+      --text: #ffffff;
+      --sub-text: rgba(255, 255, 255, 0.5);
+    }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; 
+      margin: 0; padding: 0; min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      color: var(--text); overflow: hidden;
+    }
+    .custom-bg {
+      position: fixed; top: -30px; left: -30px; right: -30px; bottom: -30px; 
+      background-image: url('fondo.jpg'); background-size: cover;
+      background-position: center; filter: blur(10px); z-index: -2;
+    }
+    .bg-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--bg-overlay); z-index: -1; transition: background 0.5s ease;
+    }
+    .top-controls {
+      position: absolute; top: 20px; left: 20px; right: 20px;
+      display: flex; justify-content: space-between; align-items: center; z-index: 10;
     }
     .btn-top {
       background: var(--glass); border: 1px solid var(--border); padding: 15px; border-radius: 50%; 
@@ -14,10 +55,9 @@ center; z-index: 10;
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
     h1 { font-size: 28px; font-weight: 800; letter-spacing: -1.5px; margin: 0; }
-    .sub { color: var(--sub-text); font-size: 11px; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; }
     .drop-zone {
       background: rgba(128,128,128,0.05); border: 1px dashed var(--sub-text);
-      border-radius: 30px; padding: 45px 20px; cursor: pointer; display: block; transition: transform 0.2s;
+      border-radius: 30px; padding: 45px 20px; cursor: pointer; display: block; margin-top: 20px;
     }
     #status { font-size: 11px; color: var(--music-pink); margin-top: 20px; font-weight: 800; }
     #saveBtn {
@@ -28,14 +68,12 @@ center; z-index: 10;
       margin-top: 20px; background: var(--glass); border-radius: 30px;
       padding: 18px 25px; width: 85%; max-width: 350px;
       border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
-      backdrop-filter: blur(35px) saturate(180%); box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      backdrop-filter: blur(35px) saturate(180%);
     }
     .controls { display: flex; align-items: center; gap: 15px; }
     .btn-svg { background: none; border: none; padding: 5px; cursor: pointer; display: flex; }
     .btn-svg svg { fill: var(--text); }
-    .social-bar {
-      margin-top: 20px; display: flex; gap: 12px; width: 85%; max-width: 350px;
-    }
+    .social-bar { margin-top: 20px; display: flex; gap: 12px; width: 85%; max-width: 350px; }
     .social-btn {
       flex: 1; background: var(--glass); border: 1px solid var(--border);
       padding: 14px; border-radius: 22px; text-decoration: none;
@@ -59,14 +97,11 @@ center; z-index: 10;
 
 <div class="contenedor">
   <h1>Texture Porter GD!</h1>
-  <div class="sub">Ultra Fidelity Porter</div>
-
   <label for="file" class="drop-zone" id="dropLabel">
     <svg width="40" height="40" viewBox="0 0 24 24" style="fill:var(--text); opacity:0.8; margin-bottom:10px;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-    <span style="font-weight: 600; display: block;">Importar Archivos o ZIP</span>
+    <span style="font-weight: 600; display: block;">Importar Pack o ZIP</span>
   </label>
   <input type="file" id="file" style="display:none;" multiple>
-
   <div id="status">READY</div>
   <button id="saveBtn">DESCARGAR PACK HD</button>
 </div>
@@ -83,43 +118,56 @@ center; z-index: 10;
 
 <div class="social-bar">
   <a href="https://discord.gg/cVn3Brk3Uw" target="_blank" class="social-btn"><svg class="social-icon" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg> Discord</a>
-  <a href="https://www.tiktok.com/@_ketsutt?_r=1&_t=ZS-944CCvR4Y8j" target="_blank" class="social-btn"><svg class="social-icon" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg> TikTok</a>
+  <a href="https://www.tiktok.com/@_ketsutt" target="_blank" class="social-btn"><svg class="social-icon" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg> TikTok</a>
 </div>
 
 <script>
   const body = document.getElementById('mainBody'); const audio = document.getElementById('audio');
   const pIco = document.getElementById('p-ico'); const mIco = document.getElementById('m-ico');
   const st = document.getElementById('status'); const sv = document.getElementById('saveBtn');
-  
+
   document.getElementById('themeBtn').onclick = () => body.classList.toggle('dark-mode');
   function playMusic() { audio.play().then(() => pIco.setAttribute('d', "M6 19h4V5H6v14zm8-14v14h4V5h-4z")).catch(()=>{}); }
   document.getElementById('btnPlay').onclick = () => { if(audio.paused) playMusic(); else { audio.pause(); pIco.setAttribute('d', "M8 5v14l11-7z"); } };
-  document.getElementById('btnMute').onclick = () => { audio.muted = !audio.muted; mIco.setAttribute('d', audio.muted ? "M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" : "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"); };
-  document.addEventListener('click', () => { if(audio.paused) playMusic(); }, { once: true });
+  document.getElementById('btnMute').onclick = () => { audio.muted = !audio.muted; };
+  document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
-  const processContent = (txt) => {
-    // Matemática pura para FNT y Plist sin fallos de redondeo
-    let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${Math.floor(parseFloat(x)/2)},${Math.floor(parseFloat(y)/2)}}`);
-    res = res.replace(/(x|y|width|height|xoffset|yoffset|xadvance|size|padding|spacing)=(\d+)/g, (m, attr, val) => `${attr}=${Math.floor(parseInt(val)/2)}`);
+  [span_4](start_span)[span_5](start_span)[span_6](start_span)// MOTOR CLONADO DE ALTA PRECISIÓN[span_4](end_span)[span_5](end_span)[span_6](end_span)
+  const processGDData = (txt) => {
+    [span_7](start_span)// 1. Redimensionar coordenadas {x,y} con precisión de suelo[span_7](end_span)
+    let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => {
+        return `{${Math.floor(parseFloat(x)/2)},${Math.floor(parseFloat(y)/2)}}`;
+    });
+    [span_8](start_span)[span_9](start_span)// 2. Escalar campos de fuentes .fnt línea por línea (idéntico a Vercel)[span_8](end_span)[span_9](end_span)
+    const fields = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight'];
+    fields.forEach(field => {
+      const regex = new RegExp(`\\b${field}=([-+]?\\d+)\\b`, 'g');
+      res = res.replace(regex, (m, val) => `${field}=${Math.floor(parseInt(val)/2)}`);
+    });
     return res.replace(/-uhd/gi, '-hd');
   };
 
-  const resizeHighQuality = async (blob) => {
-    const bitmap = await createImageBitmap(blob);
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.floor(bitmap.width / 2); canvas.height = Math.floor(bitmap.height / 2);
-    const ctx = canvas.getContext('2d', { alpha: true });
-    // CALIDAD iLoveIMG: Píxeles duros para evitar el borroso en GD
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    bitmap.close();
-    return new Promise(res => canvas.toBlob(res, 'image/png'));
+  const resizeImg = (blob) => {
+    return new Promise((res) => {
+      const img = new Image();
+      const url = URL.createObjectURL(blob);
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = Math.floor(img.width / 2); c.height = Math.floor(img.height / 2);
+        const ctx = c.getContext('2d');
+        [span_10](start_span)// SIN SUAVIZADO: Mantiene los píxeles nítidos y duros (Estilo Vercel/GD)[span_10](end_span)
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        c.toBlob((b) => { URL.revokeObjectURL(url); res(b); }, 'image/png');
+      };
+      img.src = url;
+    });
   };
 
   document.getElementById('file').addEventListener('change', async function(e) {
     const files = e.target.files; if(!files.length) return;
     const zipOut = new JSZip();
-    st.innerText = "REDIMENSIONANDO TODO EL PACK...";
+    st.innerText = "CLONANDO MOTOR DE PRECISIÓN...";
 
     for (let f of files) {
       if (f.name.endsWith('.zip')) {
@@ -127,27 +175,27 @@ center; z-index: 10;
         for (let path in zipIn.files) {
           const entry = zipIn.files[path];
           if (entry.dir || path.includes('__MACOSX')) continue;
-          let newName = path.replace(/-uhd/gi, '-hd');
+          let newPath = path.replace(/-uhd/gi, '-hd');
           if (path.toLowerCase().endsWith('.png')) {
-            zipOut.file(newName, await resizeHighQuality(await entry.async("blob")));
+            zipOut.file(newPath, await resizeImg(await entry.async("blob")));
           } else if (path.toLowerCase().endsWith('.plist') || path.toLowerCase().endsWith('.fnt')) {
-            zipOut.file(newName, processContent(await entry.async("string")));
-          } else { zipOut.file(newName, await entry.async("blob")); }
+            zipOut.file(newPath, processGDData(await entry.async("string")));
+          } else { zipOut.file(newPath, await entry.async("blob")); }
         }
       } else {
         let newName = f.name.replace(/-uhd/gi, '-hd');
         if (f.name.toLowerCase().endsWith('.png')) {
-          zipOut.file(newName, await resizeHighQuality(f));
+          zipOut.file(newName, await resizeImg(f));
         } else if (f.name.toLowerCase().endsWith('.plist') || f.name.toLowerCase().endsWith('.fnt')) {
-          zipOut.file(newName, processContent(await f.text()));
+          zipOut.file(newName, processGDData(await f.text()));
         } else { zipOut.file(newName, f); }
       }
     }
-    st.innerText = "¡PROCESO COMPLETADO!"; sv.style.display = "block";
+    st.innerText = "¡TODO LISTO CON PRECISIÓN MÁXIMA!"; sv.style.display = "block";
     sv.onclick = async () => {
       const content = await zipOut.generateAsync({type:"blob"});
       const a = document.createElement("a"); a.href = URL.createObjectURL(content);
-      a.download = "GD_HighQuality_Fix.zip"; a.click();
+      a.download = "GD_Perfect_Port.zip"; a.click();
     };
   });
 </script>
