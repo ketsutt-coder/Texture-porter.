@@ -28,6 +28,7 @@
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       color: var(--text); overflow: hidden;
     }
+
     .custom-bg {
       position: fixed; top: -30px; left: -30px; right: -30px; bottom: -30px; 
       background-image: url('fondo.jpg'); background-size: cover;
@@ -37,6 +38,7 @@
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: var(--bg-overlay); z-index: -1; transition: background 0.5s ease;
     }
+
     .top-controls {
       display: flex; justify-content: space-between; align-items: center; 
       width: 85%; max-width: 350px; margin-bottom: 20px; z-index: 10;
@@ -58,6 +60,7 @@
       padding: 30px 25px; width: 85%; max-width: 350px; text-align: center;
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
+
     .profile-section { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
     .profile-pic {
       width: 85px; height: 85px; border-radius: 50%;
@@ -67,10 +70,13 @@
     .profile-welcome { margin-top: 12px; font-weight: 800; font-size: 16px; letter-spacing: -0.5px; }
 
     h1 { font-size: 20px; font-weight: 800; letter-spacing: -1px; margin: 5px 0; }
+    
     .drop-zone {
       background: rgba(128,128,128,0.05); border: 1px dashed var(--sub-text);
       border-radius: 30px; padding: 40px 20px; cursor: pointer; display: block; margin-top: 15px;
+      transition: transform 0.2s;
     }
+    .drop-zone:active { transform: scale(0.98); }
     #status { font-size: 11px; color: var(--music-pink); margin-top: 20px; font-weight: 800; }
     #saveBtn {
       background: var(--music-pink); color: #ffffff; border: none; padding: 18px; border-radius: 24px; 
@@ -81,6 +87,7 @@
       margin-top: 20px; background: var(--glass); border-radius: 30px;
       padding: 18px 25px; width: 85%; max-width: 350px; border: 1px solid var(--border);
       display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(35px) saturate(180%);
+      -webkit-backdrop-filter: blur(35px) saturate(180%);
     }
     .btn-svg { background: none; border: none; padding: 5px; cursor: pointer; display: flex; align-items: center; }
     .btn-svg svg { fill: var(--text); width: 22px; height: 22px; }
@@ -137,7 +144,7 @@
 </div>
 
 <script>
-  /* Lógica de UI y Música */
+  /* Interfaz y Audio */
   const body = document.getElementById('mainBody'); const audio = document.getElementById('audio');
   const st = document.getElementById('status'); const sv = document.getElementById('saveBtn');
   const mIco = document.getElementById('m-ico'); const pIco = document.getElementById('p-ico');
@@ -151,81 +158,64 @@
     mIco.setAttribute('d', audio.muted ? "M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" : "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z");
   };
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
-  
-  /* Procesamiento Plist/FNT */
+
+  /* * CORRECCIÓN 1: Matemáticas de Coordenadas
+   * Usamos parseFloat para mantener los decimales exactos en el .plist y no saltarnos píxeles.
+   */
   const processData = (txt) => {
-    let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${Math.floor(parseFloat(x)/2)},${Math.floor(parseFloat(y)/2)}}`);
+    // Para las cajas del Plist, conservamos la precisión milimétrica (sin floor)
+    let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${parseFloat(x)/2},${parseFloat(y)/2}}`);
+    
+    // Para los archivos FNT (fuentes), redondeamos de manera segura
     const tags = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight', 'scaleW', 'scaleH'];
     tags.forEach(t => {
       const regex = new RegExp(`\\b${t}=([-+]?\\d+)\\b`, 'g');
-      res = res.replace(regex, (m, v) => `${t}=${Math.floor(parseInt(v)/2)}`);
+      res = res.replace(regex, (m, v) => `${t}=${Math.round(parseInt(v)/2)}`);
     });
     return res.replace(/-uhd/gi, '-hd');
   };
 
-  /* MOTOR MATEMÁTICO 2X2 PARA EVITAR ALPHA BLEEDING */
-  const resizeImg = async (blob) => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      const url = URL.createObjectURL(blob);
-      
+  /* * CORRECCIÓN 2: ESCÁNER ANTI-SANGRADO BLANCO
+   */
+  const resizeQuality = async (blob) => {
+    return new Promise((res) => {
+      const img = new Image(); img.src = URL.createObjectURL(blob);
       img.onload = () => {
-        URL.revokeObjectURL(url);
+        // 1. Dibujamos la imagen original en memoria
+        const cOrig = document.createElement('canvas');
+        cOrig.width = img.width; cOrig.height = img.height;
+        const ctxOrig = cOrig.getContext('2d', { willReadFrequently: true });
+        ctxOrig.drawImage(img, 0, 0);
         
-        // Dibujamos la imagen original
-        const srcCanvas = document.createElement('canvas');
-        srcCanvas.width = img.width; srcCanvas.height = img.height;
-        const srcCtx = srcCanvas.getContext('2d', { willReadFrequently: true });
-        srcCtx.drawImage(img, 0, 0);
-        const srcData = srcCtx.getImageData(0, 0, srcCanvas.width, srcCanvas.height).data;
-
-        // Preparamos la nueva imagen (mitad de tamaño)
-        const dstW = Math.floor(img.width / 2);
-        const dstH = Math.floor(img.height / 2);
-        const dstCanvas = document.createElement('canvas');
-        dstCanvas.width = dstW; dstCanvas.height = dstH;
-        const dstCtx = dstCanvas.getContext('2d');
-        const dstImgData = dstCtx.createImageData(dstW, dstH);
-        const dstData = dstImgData.data;
-
-        // Algoritmo Anti-Sangrado (Fusiona 4 píxeles en 1 solo pesando la transparencia)
-        for (let y = 0; y < dstH; y++) {
-          for (let x = 0; x < dstW; x++) {
-            const i = (y * dstW + x) * 4;
-            
-            // Índices de los 4 píxeles originales
-            const tl = ((y * 2) * srcCanvas.width + (x * 2)) * 4;
-            const tr = tl + 4;
-            const bl = ((y * 2 + 1) * srcCanvas.width + (x * 2)) * 4;
-            const br = bl + 4;
-
-            // Extraemos la transparencia (Alpha) de los 4 píxeles
-            const a1 = srcData[tl + 3], a2 = srcData[tr + 3], a3 = srcData[bl + 3], a4 = srcData[br + 3];
-            const totalA = a1 + a2 + a3 + a4;
-
-            // Si los 4 píxeles son invisibles, el nuevo también lo será (SIN arrastrar colores raros)
-            if (totalA === 0) {
-              dstData[i] = 0; dstData[i+1] = 0; dstData[i+2] = 0; dstData[i+3] = 0;
-            } else {
-              // Si tienen color, promediamos SÓLO los colores que son visibles
-              dstData[i]   = Math.round((srcData[tl]*a1 + srcData[tr]*a2 + srcData[bl]*a3 + srcData[br]*a4) / totalA);
-              dstData[i+1] = Math.round((srcData[tl+1]*a1 + srcData[tr+1]*a2 + srcData[bl+1]*a3 + srcData[br+1]*a4) / totalA);
-              dstData[i+2] = Math.round((srcData[tl+2]*a1 + srcData[tr+2]*a2 + srcData[bl+2]*a3 + srcData[br+2]*a4) / totalA);
-              dstData[i+3] = Math.round(totalA / 4); // El nuevo nivel de transparencia
-            }
+        // 2. Escaneamos la imagen para matar los píxeles blancos invisibles
+        const imgData = ctxOrig.getImageData(0, 0, cOrig.width, cOrig.height);
+        const data = imgData.data;
+        for(let i = 0; i < data.length; i += 4) {
+          if(data[i+3] === 0) { // Si el píxel es totalmente transparente
+            data[i] = 0;     // Forzamos Rojo a 0
+            data[i+1] = 0;   // Forzamos Verde a 0
+            data[i+2] = 0;   // Forzamos Azul a 0
           }
         }
+        ctxOrig.putImageData(imgData, 0, 0);
+
+        // 3. Achicamos la imagen limpia con calidad de estudio
+        const cDest = document.createElement('canvas');
+        cDest.width = Math.floor(img.width / 2); cDest.height = Math.floor(img.height / 2);
+        const ctxDest = cDest.getContext('2d');
         
-        dstCtx.putImageData(dstImgData, 0, 0);
-        dstCanvas.toBlob(resolve, 'image/png');
+        ctxDest.imageSmoothingEnabled = true;
+        ctxDest.imageSmoothingQuality = 'high';
+        ctxDest.drawImage(cOrig, 0, 0, cDest.width, cDest.height);
+        
+        cDest.toBlob(res, 'image/png');
       };
-      img.src = url;
     });
   };
 
-  document.getElementById('file').addEventListener('change', async function(e) {
+  document.getElementById('file').onchange = async (e) => {
     const files = e.target.files; if(!files.length) return;
-    const zipOut = new JSZip(); st.innerText = "PROCESANDO CON ANTI-SANGRADO...";
+    const zipOut = new JSZip(); st.innerText = "LIMPIANDO Y PORTEANDO...";
     
     for (let f of files) {
       if (f.name.toLowerCase().endsWith('.zip')) {
@@ -233,13 +223,13 @@
         for (let path in zipIn.files) {
           const entry = zipIn.files[path]; if(entry.dir || path.includes('__MACOSX')) continue;
           let nPath = path.replace(/-uhd/gi, '-hd');
-          if (path.toLowerCase().endsWith('.png')) zipOut.file(nPath, await resizeImg(await entry.async("blob")));
+          if (path.toLowerCase().endsWith('.png')) zipOut.file(nPath, await resizeQuality(await entry.async("blob")));
           else if (path.match(/\.(plist|fnt)$/i)) zipOut.file(nPath, processData(await entry.async("string")));
           else zipOut.file(nPath, await entry.async("blob"));
         }
       } else {
         let n = f.name.replace(/-uhd/gi, '-hd');
-        if (f.name.toLowerCase().endsWith('.png')) zipOut.file(n, await resizeImg(f));
+        if (f.name.toLowerCase().endsWith('.png')) zipOut.file(n, await resizeQuality(f));
         else if (f.name.match(/\.(plist|fnt)$/i)) zipOut.file(n, processData(await f.text()));
         else zipOut.file(n, f);
       }
@@ -250,7 +240,7 @@
       const a = document.createElement("a"); a.href = URL.createObjectURL(content);
       a.download = "TexturePack_Perfect_By_Ketsu.zip"; a.click();
     };
-  });
+  };
 </script>
 </body>
 </html>
