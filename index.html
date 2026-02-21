@@ -125,7 +125,7 @@
   </label>
   <input type="file" id="file" style="display:none;" multiple>
   <div id="status">READY</div>
-  <button id="saveBtn">DESCARGAR PACK HD</button>
+  <button id="saveBtn">DESCARGAR PACK PERFECTO</button>
 </div>
 
 <div class="mini-player">
@@ -159,79 +159,63 @@
   };
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
-  /* REPARACIÓN GLOW: El que más te gustó y mantuvo todo en su lugar */
+  /* * CORRECCIÓN 1: Matemáticas de Coordenadas
+   * Usamos parseFloat para mantener los decimales exactos en el .plist y no saltarnos píxeles.
+   */
   const processData = (txt) => {
-    let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${Math.floor(parseFloat(x)/2)},${Math.floor(parseFloat(y)/2)}}`);
+    // Para las cajas del Plist, conservamos la precisión milimétrica (sin floor)
+    let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${parseFloat(x)/2},${parseFloat(y)/2}}`);
+    
+    // Para los archivos FNT (fuentes), redondeamos de manera segura
     const tags = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight', 'scaleW', 'scaleH'];
     tags.forEach(t => {
       const regex = new RegExp(`\\b${t}=([-+]?\\d+)\\b`, 'g');
-      res = res.replace(regex, (m, v) => `${t}=${Math.floor(parseInt(v)/2)}`);
+      res = res.replace(regex, (m, v) => `${t}=${Math.round(parseInt(v)/2)}`);
     });
     return res.replace(/-uhd/gi, '-hd');
   };
 
-  /* EL MOTOR DEFINITIVO: Redimensionado Manual Píxel por Píxel (Anti líneas blancas/negras) */
-  const resizeQuality = (blob) => {
-    return new Promise((resolve) => {
-      const img = new Image();
+  /* * CORRECCIÓN 2: ESCÁNER ANTI-SANGRADO BLANCO
+   */
+  const resizeQuality = async (blob) => {
+    return new Promise((res) => {
+      const img = new Image(); img.src = URL.createObjectURL(blob);
       img.onload = () => {
-        const w = img.width; const h = img.height;
-        const halfW = Math.floor(w / 2); const halfH = Math.floor(h / 2);
-
-        // 1. Leemos la imagen original exacta
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        ctx.drawImage(img, 0, 0);
-        const srcData = ctx.getImageData(0, 0, w, h).data;
-
-        // 2. Preparamos el lienzo destino (Mitad de tamaño)
-        const dstCanvas = document.createElement('canvas');
-        dstCanvas.width = halfW; dstCanvas.height = halfH;
-        const dstCtx = dstCanvas.getContext('2d');
-        const dstImgData = dstCtx.createImageData(halfW, halfH);
-        const dstData = dstImgData.data;
-
-        // 3. Matemáticas puras: Promediamos 4 píxeles en 1 sin dejar que el navegador arruine el borde
-        for (let y = 0; y < halfH; y++) {
-          for (let x = 0; x < halfW; x++) {
-            const dstIdx = (y * halfW + x) * 4;
-            const srcX = x * 2; const srcY = y * 2;
-
-            // Índices de los 4 píxeles en UHD
-            const idx1 = (srcY * w + srcX) * 4;
-            const idx2 = (srcY * w + srcX + 1) * 4;
-            const idx3 = ((srcY + 1) * w + srcX) * 4;
-            const idx4 = ((srcY + 1) * w + srcX + 1) * 4;
-
-            // Transparencias (Alpha)
-            const a1 = srcData[idx1 + 3]; const a2 = srcData[idx2 + 3];
-            const a3 = srcData[idx3 + 3]; const a4 = srcData[idx4 + 3];
-            const sumA = a1 + a2 + a3 + a4;
-
-            if (sumA === 0) {
-              // Si los 4 son invisibles, el nuevo es invisible perfecto
-              dstData[dstIdx] = 0; dstData[dstIdx + 1] = 0;
-              dstData[dstIdx + 2] = 0; dstData[dstIdx + 3] = 0;
-            } else {
-              // Si tienen color, promediamos basados ÚNICAMENTE en la parte visible
-              dstData[dstIdx] = Math.round((srcData[idx1]*a1 + srcData[idx2]*a2 + srcData[idx3]*a3 + srcData[idx4]*a4) / sumA);
-              dstData[dstIdx + 1] = Math.round((srcData[idx1+1]*a1 + srcData[idx2+1]*a2 + srcData[idx3+1]*a3 + srcData[idx4+1]*a4) / sumA);
-              dstData[dstIdx + 2] = Math.round((srcData[idx1+2]*a1 + srcData[idx2+2]*a2 + srcData[idx3+2]*a3 + srcData[idx4+2]*a4) / sumA);
-              dstData[dstIdx + 3] = Math.round(sumA / 4);
-            }
+        // 1. Dibujamos la imagen original en memoria
+        const cOrig = document.createElement('canvas');
+        cOrig.width = img.width; cOrig.height = img.height;
+        const ctxOrig = cOrig.getContext('2d', { willReadFrequently: true });
+        ctxOrig.drawImage(img, 0, 0);
+        
+        // 2. Escaneamos la imagen para matar los píxeles blancos invisibles
+        const imgData = ctxOrig.getImageData(0, 0, cOrig.width, cOrig.height);
+        const data = imgData.data;
+        for(let i = 0; i < data.length; i += 4) {
+          if(data[i+3] === 0) { // Si el píxel es totalmente transparente
+            data[i] = 0;     // Forzamos Rojo a 0
+            data[i+1] = 0;   // Forzamos Verde a 0
+            data[i+2] = 0;   // Forzamos Azul a 0
           }
         }
-        dstCtx.putImageData(dstImgData, 0, 0);
-        dstCanvas.toBlob(resolve, 'image/png');
+        ctxOrig.putImageData(imgData, 0, 0);
+
+        // 3. Achicamos la imagen limpia con calidad de estudio
+        const cDest = document.createElement('canvas');
+        cDest.width = Math.floor(img.width / 2); cDest.height = Math.floor(img.height / 2);
+        const ctxDest = cDest.getContext('2d');
+        
+        ctxDest.imageSmoothingEnabled = true;
+        ctxDest.imageSmoothingQuality = 'high';
+        ctxDest.drawImage(cOrig, 0, 0, cDest.width, cDest.height);
+        
+        cDest.toBlob(res, 'image/png');
       };
-      img.src = URL.createObjectURL(blob);
     });
   };
 
   document.getElementById('file').onchange = async (e) => {
     const files = e.target.files; if(!files.length) return;
-    const zipOut = new JSZip(); st.innerText = "PORTEANDO PACK...";
+    const zipOut = new JSZip(); st.innerText = "LIMPIANDO Y PORTEANDO...";
     
     for (let f of files) {
       if (f.name.toLowerCase().endsWith('.zip')) {
@@ -254,7 +238,7 @@
     sv.onclick = async () => {
       const content = await zipOut.generateAsync({type:"blob"});
       const a = document.createElement("a"); a.href = URL.createObjectURL(content);
-      a.download = "TexturePack_HD_By_Ketsu.zip"; a.click();
+      a.download = "TexturePack_Perfect_By_Ketsu.zip"; a.click();
     };
   };
 </script>
