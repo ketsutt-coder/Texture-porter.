@@ -144,7 +144,6 @@
 </div>
 
 <script>
-  /* Interfaz y Audio */
   const body = document.getElementById('mainBody'); const audio = document.getElementById('audio');
   const st = document.getElementById('status'); const sv = document.getElementById('saveBtn');
   const mIco = document.getElementById('m-ico'); const pIco = document.getElementById('p-ico');
@@ -159,47 +158,57 @@
   };
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
-  /* * CORRECCIÓN 1: Matemáticas de Coordenadas
-   * Usamos parseFloat para mantener los decimales exactos en el .plist y no saltarnos píxeles.
-   */
+  /* REPARACIÓN GLOW: Vuelve el Math.floor original para la precisión perfecta de GD */
   const processData = (txt) => {
-    // Para las cajas del Plist, conservamos la precisión milimétrica (sin floor)
-    let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${parseFloat(x)/2},${parseFloat(y)/2}}`);
-    
-    // Para los archivos FNT (fuentes), redondeamos de manera segura
+    let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${Math.floor(parseFloat(x)/2)},${Math.floor(parseFloat(y)/2)}}`);
     const tags = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight', 'scaleW', 'scaleH'];
     tags.forEach(t => {
       const regex = new RegExp(`\\b${t}=([-+]?\\d+)\\b`, 'g');
-      res = res.replace(regex, (m, v) => `${t}=${Math.round(parseInt(v)/2)}`);
+      res = res.replace(regex, (m, v) => `${t}=${Math.floor(parseInt(v)/2)}`);
     });
     return res.replace(/-uhd/gi, '-hd');
   };
 
-  /* * CORRECCIÓN 2: ESCÁNER ANTI-SANGRADO BLANCO
-   */
+  /* REPARACIÓN LÍNEAS BLANCAS Y NEGRAS: Motor de Dilatación de Color (Alpha Bleed) */
   const resizeQuality = async (blob) => {
     return new Promise((res) => {
       const img = new Image(); img.src = URL.createObjectURL(blob);
       img.onload = () => {
-        // 1. Dibujamos la imagen original en memoria
+        // 1. Cargamos imagen
         const cOrig = document.createElement('canvas');
         cOrig.width = img.width; cOrig.height = img.height;
         const ctxOrig = cOrig.getContext('2d', { willReadFrequently: true });
         ctxOrig.drawImage(img, 0, 0);
         
-        // 2. Escaneamos la imagen para matar los píxeles blancos invisibles
+        // 2. Escáner Inteligente (Expande el color a los píxeles invisibles)
         const imgData = ctxOrig.getImageData(0, 0, cOrig.width, cOrig.height);
         const data = imgData.data;
-        for(let i = 0; i < data.length; i += 4) {
-          if(data[i+3] === 0) { // Si el píxel es totalmente transparente
-            data[i] = 0;     // Forzamos Rojo a 0
-            data[i+1] = 0;   // Forzamos Verde a 0
-            data[i+2] = 0;   // Forzamos Azul a 0
+        const out = new Uint8ClampedArray(data);
+        const w = img.width; const h = img.height;
+
+        for(let y = 0; y < h; y++) {
+          for(let x = 0; x < w; x++) {
+            let i = (y * w + x) * 4;
+            if(data[i+3] === 0) { // Si el píxel no se ve
+              let r=0, g=0, b=0, count=0;
+              // Copiamos el color de los píxeles vecinos
+              if(x > 0 && data[i-4+3] > 0) { r+=data[i-4]; g+=data[i-3]; b+=data[i-2]; count++; }
+              if(x < w-1 && data[i+4+3] > 0) { r+=data[i+4]; g+=data[i+5]; b+=data[i+6]; count++; }
+              if(y > 0 && data[i-w*4+3] > 0) { r+=data[i-w*4]; g+=data[i-w*4+1]; b+=data[i-w*4+2]; count++; }
+              if(y < h-1 && data[i+w*4+3] > 0) { r+=data[i+w*4]; g+=data[i+w*4+1]; b+=data[i+w*4+2]; count++; }
+
+              if(count > 0) {
+                out[i] = Math.round(r/count);
+                out[i+1] = Math.round(g/count);
+                out[i+2] = Math.round(b/count);
+              }
+            }
           }
         }
+        imgData.data.set(out);
         ctxOrig.putImageData(imgData, 0, 0);
 
-        // 3. Achicamos la imagen limpia con calidad de estudio
+        // 3. Redimensionado Perfecto
         const cDest = document.createElement('canvas');
         cDest.width = Math.floor(img.width / 2); cDest.height = Math.floor(img.height / 2);
         const ctxDest = cDest.getContext('2d');
