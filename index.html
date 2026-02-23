@@ -5,129 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Texture Porter GD! | By Ketsu</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  
   <style>
-    :root {
-      --music-pink: #ff2d55;
-      --bg-overlay: rgba(242, 242, 247, 0.25);
-      --glass: rgba(255, 255, 255, 0.45);
-      --border: rgba(255, 255, 255, 0.5);
-      --text: #000000;
-      --sub-text: rgba(0, 0, 0, 0.6);
-    }
-    body.dark-mode {
-      --bg-overlay: rgba(0, 0, 0, 0.4);
-      --glass: rgba(28, 28, 30, 0.5);
-      --border: rgba(255, 255, 255, 0.15);
-      --text: #ffffff;
-      --sub-text: rgba(255, 255, 255, 0.5);
-    }
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; 
-      margin: 0; padding: 0; min-height: 100vh;
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      color: var(--text); overflow: hidden;
-    }
-
-    .custom-bg {
-      position: fixed; top: -30px; left: -30px; right: -30px; bottom: -30px; 
-      background-image: url('fondo.jpg'); background-size: cover;
-      background-position: center; filter: blur(10px); z-index: -2;
-    }
-    .bg-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: var(--bg-overlay); z-index: -1; transition: background 0.5s ease;
-    }
-
-    .top-controls {
-      display: flex; justify-content: space-between; align-items: center; 
-      width: 85%; max-width: 350px; margin-bottom: 20px; z-index: 10;
-    }
-    .btn-top {
-      background: var(--glass); border: 1px solid var(--border); 
-      width: 50px; height: 50px; border-radius: 50%; cursor: pointer; 
-      backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s ease;
-    }
+    :root { --music-pink: #ff2d55; --bg-overlay: rgba(242, 242, 247, 0.25); --glass: rgba(255, 255, 255, 0.45); --border: rgba(255, 255, 255, 0.5); --text: #000000; --sub-text: rgba(0, 0, 0, 0.6); }
+    body.dark-mode { --bg-overlay: rgba(0, 0, 0, 0.4); --glass: rgba(28, 28, 30, 0.5); --border: rgba(255, 255, 255, 0.15); --text: #ffffff; --sub-text: rgba(255, 255, 255, 0.5); }
+    body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--text); overflow: hidden; }
+    .custom-bg { position: fixed; top: -30px; left: -30px; right: -30px; bottom: -30px; background-image: url('fondo.jpg'); background-size: cover; background-position: center; filter: blur(10px); z-index: -2; }
+    .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; transition: background 0.5s ease; }
+    .top-controls { display: flex; justify-content: space-between; align-items: center; width: 85%; max-width: 350px; margin-bottom: 20px; z-index: 10; }
+    .btn-top { background: var(--glass); border: 1px solid var(--border); width: 50px; height: 50px; border-radius: 50%; cursor: pointer; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s ease; }
     .btn-top:active { transform: scale(0.92); }
     .btn-top svg { fill: var(--text); }
-
-    .contenedor {
-      background: var(--glass); backdrop-filter: blur(35px) saturate(180%);
-      -webkit-backdrop-filter: blur(35px) saturate(180%);
-      border: 1px solid var(--border); border-radius: 40px;
-      padding: 30px 25px; width: 85%; max-width: 350px; text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-
+    .contenedor { background: var(--glass); backdrop-filter: blur(35px) saturate(180%); -webkit-backdrop-filter: blur(35px) saturate(180%); border: 1px solid var(--border); border-radius: 40px; padding: 30px 25px; width: 85%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
     .profile-section { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
-    .profile-pic {
-      width: 85px; height: 85px; border-radius: 50%;
-      border: 3px solid var(--music-pink); object-fit: cover;
-      box-shadow: 0 4px 15px rgba(255, 45, 85, 0.3);
-    }
+    .profile-pic { width: 85px; height: 85px; border-radius: 50%; border: 3px solid var(--music-pink); object-fit: cover; box-shadow: 0 4px 15px rgba(255, 45, 85, 0.3); }
     .profile-welcome { margin-top: 12px; font-weight: 800; font-size: 16px; letter-spacing: -0.5px; }
-
     h1 { font-size: 20px; font-weight: 800; letter-spacing: -1px; margin: 5px 0; }
-    
-    .drop-zone {
-      background: rgba(128,128,128,0.05); border: 1px dashed var(--sub-text);
-      border-radius: 30px; padding: 40px 20px; cursor: pointer; display: block; margin-top: 15px;
-      transition: transform 0.2s;
-    }
+    .drop-zone { background: rgba(128,128,128,0.05); border: 1px dashed var(--sub-text); border-radius: 30px; padding: 40px 20px; cursor: pointer; display: block; margin-top: 15px; transition: transform 0.2s; }
     .drop-zone:active { transform: scale(0.98); }
     #status { font-size: 11px; color: var(--music-pink); margin-top: 20px; font-weight: 800; }
-    #saveBtn {
-      background: var(--music-pink); color: #ffffff; border: none; padding: 18px; border-radius: 24px; 
-      width: 100%; font-weight: 800; margin-top: 20px; display: none; cursor: pointer;
-    }
-
-    .mini-player {
-      margin-top: 20px; background: var(--glass); border-radius: 30px;
-      padding: 18px 25px; width: 85%; max-width: 350px; border: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(35px) saturate(180%);
-      -webkit-backdrop-filter: blur(35px) saturate(180%);
-    }
+    #saveBtn { background: var(--music-pink); color: #ffffff; border: none; padding: 18px; border-radius: 24px; width: 100%; font-weight: 800; margin-top: 20px; display: none; cursor: pointer; }
+    .mini-player { margin-top: 20px; background: var(--glass); border-radius: 30px; padding: 18px 25px; width: 85%; max-width: 350px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(35px) saturate(180%); -webkit-backdrop-filter: blur(35px) saturate(180%); }
     .btn-svg { background: none; border: none; padding: 5px; cursor: pointer; display: flex; align-items: center; }
     .btn-svg svg { fill: var(--text); width: 22px; height: 22px; }
     #btnPlay svg { width: 32px; height: 32px; }
-
     .social-bar { margin-top: 20px; display: flex; gap: 12px; width: 85%; max-width: 350px; }
-    .social-btn {
-      flex: 1; background: var(--glass); border: 1px solid var(--border); padding: 14px; border-radius: 22px;
-      text-decoration: none; color: var(--text); font-size: 13px; font-weight: 700;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
+    .social-btn { flex: 1; background: var(--glass); border: 1px solid var(--border); padding: 14px; border-radius: 22px; text-decoration: none; color: var(--text); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; }
   </style>
 </head>
 <body id="mainBody">
-
-<div class="custom-bg"></div>
-<div class="bg-overlay"></div>
-
+<div class="custom-bg"></div><div class="bg-overlay"></div>
 <div class="top-controls">
-  <button class="btn-top" id="btnMute">
-    <svg width="20" height="20" viewBox="0 0 24 24"><path id="m-ico" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-  </button>
+  <button class="btn-top" id="btnMute"><svg width="20" height="20" viewBox="0 0 24 24"><path id="m-ico" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button>
   <button class="btn-top" id="themeBtn" style="font-size: 18px;">🌓</button>
 </div>
-
 <div class="contenedor">
-  <div class="profile-section">
-    <img src="Perfil.jpg" alt="Ketsu" class="profile-pic" onerror="this.src='https://via.placeholder.com/150/ff2d55/ffffff?text=K'">
-    <div class="profile-welcome">Ketsu te da la bienvenida :D</div>
-  </div>
-
+  <div class="profile-section"><img src="Perfil.jpg" alt="Ketsu" class="profile-pic" onerror="this.src='https://via.placeholder.com/150/ff2d55/ffffff?text=K'"><div class="profile-welcome">Ketsu te da la bienvenida :D</div></div>
   <h1>Texture Porter GD!</h1>
-  <label for="file" class="drop-zone">
-    <span style="font-weight: 600;">Importar Pack o ZIP</span>
-  </label>
+  <label for="file" class="drop-zone"><span style="font-weight: 600;">Importar Pack UHD</span></label>
   <input type="file" id="file" style="display:none;" multiple>
   <div id="status">READY</div>
-  <button id="saveBtn">DESCARGAR PACK EN HD (60x60)</button>
+  <button id="saveBtn">DESCARGAR MENÚS HD (MÉTODO COLON)</button>
 </div>
-
 <div class="mini-player">
   <div style="text-align: left;"><span style="font-size: 13px; font-weight: 800; display: block;">menuLoop</span><span style="font-size: 11px; color: var(--music-pink);">Geometry Dash OST</span></div>
   <div style="display: flex; gap: 10px; align-items: center;">
@@ -137,177 +55,77 @@
   </div>
   <audio id="audio" loop src="menuLoop.mp3"></audio>
 </div>
-
-<div class="social-bar">
-  <a href="https://discord.gg/cVn3Brk3Uw" target="_blank" class="social-btn">Discord</a>
-  <a href="https://www.tiktok.com/@_ketsutt" target="_blank" class="social-btn">TikTok</a>
-</div>
+<div class="social-bar"><a href="https://discord.gg/cVn3Brk3Uw" target="_blank" class="social-btn">Discord</a><a href="https://www.tiktok.com/@_ketsutt" target="_blank" class="social-btn">TikTok</a></div>
 
 <script>
-  /* Interfaz y Audio (INTACTO) */
   const body = document.getElementById('mainBody'); const audio = document.getElementById('audio');
   const st = document.getElementById('status'); const sv = document.getElementById('saveBtn');
-  const mIco = document.getElementById('m-ico'); const pIco = document.getElementById('p-ico');
-  const pBtn = document.getElementById('btnPlay');
-  
+  const mIco = document.getElementById('m-ico'); const pIco = document.getElementById('p-ico'); const pBtn = document.getElementById('btnPlay');
   document.getElementById('themeBtn').onclick = () => body.classList.toggle('dark-mode');
   function playMusic() { audio.play().then(() => pIco.setAttribute('d', "M6 19h4V5H6v14zm8-14v14h4V5h-4z")).catch(()=>{}); }
   pBtn.onclick = () => { if(audio.paused) playMusic(); else { audio.pause(); pIco.setAttribute('d', "M8 5v14l11-7z"); } };
-  document.getElementById('btnMute').onclick = () => { 
-    audio.muted = !audio.muted;
-    mIco.setAttribute('d', audio.muted ? "M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" : "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z");
-  };
+  document.getElementById('btnMute').onclick = () => { audio.muted = !audio.muted; };
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
-  /* REESCRITURA MATEMÁTICA PARA PLIST (La original que siempre funcionó) */
-  const processData = (txt) => {
-    let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${parseFloat(x)/2},${parseFloat(y)/2}}`);
-    const tags = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight', 'scaleW', 'scaleH'];
-    tags.forEach(t => {
-      const regex = new RegExp(`\\b${t}=([-+]?\\d+)\\b`, 'g');
-      res = res.replace(regex, (m, v) => `${t}=${Math.round(parseInt(v)/2)}`);
-    });
-    return res.replace(/-uhd/gi, '-hd');
+  /* PROCESAMIENTO ESTILO GD COLON */
+  const processPlist = (text) => {
+    return text.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${parseFloat(x)/2},${parseFloat(y)/2}}`)
+               .replace(/-uhd/gi, '-hd');
   };
 
-  /* REDIMENSIÓN BÁSICA (Para fondos sueltos) */
-  const resizeQuality = async (blob) => {
-    return new Promise((res) => {
-      const img = new Image(); img.src = URL.createObjectURL(blob);
+  const smartPort = async (imgBlob, plistText) => {
+    return new Promise((resolve) => {
+      const img = new Image(); img.src = URL.createObjectURL(imgBlob);
       img.onload = () => {
-        const cDest = document.createElement('canvas');
-        cDest.width = Math.floor(img.width / 2); cDest.height = Math.floor(img.height / 2);
-        const ctxDest = cDest.getContext('2d');
-        ctxDest.imageSmoothingEnabled = true; ctxDest.imageSmoothingQuality = 'high';
-        ctxDest.drawImage(img, 0, 0, cDest.width, cDest.height);
-        cDest.toBlob(res, 'image/png');
-      };
-    });
-  };
+        const c = document.createElement('canvas');
+        c.width = Math.floor(img.width / 2); c.height = Math.floor(img.height / 2);
+        const ctx = c.getContext('2d');
+        ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
 
-  /* =========================================================================
-   * 🔥 MOTOR COLON "IN-PLACE" (DESPLISTEA -> ENCOGE AISLADO -> PLISTEA EN SU LUGAR)
-   * ¡ESTO EVITA QUE LOS BOTONES ROTADOS SE CORTEN Y MANTIENE EL DISEÑO INTACTO!
-   * ========================================================================= */
-  const processColonInPlace = async (blob, plistText) => {
-    return new Promise((res) => {
-      const img = new Image(); img.src = URL.createObjectURL(blob);
-      img.onload = () => {
-        const cDest = document.createElement('canvas');
-        cDest.width = Math.floor(img.width / 2); cDest.height = Math.floor(img.height / 2);
-        const ctxDest = cDest.getContext('2d');
-        
-        // Expresión para leer TODAS las cajas de coordenadas (textureRect o frame)
-        const frameRegex = /<key>(?:frame|textureRect)<\/key>\s*<string>\{\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\},\s*\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}\}<\/string>/g;
-        let match;
-        
-        while((match = frameRegex.exec(plistText)) !== null) {
-          const x = parseFloat(match[1]); const y = parseFloat(match[2]);
-          const w = parseFloat(match[3]); const h = parseFloat(match[4]);
-          if(w === 0 || h === 0) continue;
-
-          const cw = Math.ceil(w); const ch = Math.ceil(h);
-          
-          // 1. DESPLISTEAR (Cortar el botón con tijeras en su tamaño original)
-          const tempC = document.createElement('canvas');
-          tempC.width = cw; tempC.height = ch;
-          const tempCtx = tempC.getContext('2d', { willReadFrequently: true });
-          tempCtx.drawImage(img, x, y, w, h, 0, 0, w, h);
-          
-          // 2. BLEEDING AISLADO (Contagia colores para que al encoger NO haya líneas negras)
-          const imgData = tempCtx.getImageData(0, 0, cw, ch);
-          const data = imgData.data; const rowW = cw * 4;
-          for(let py = 0; py < ch; py++) {
-            for(let px = 0; px < cw; px++) {
-              let idx = (py * cw + px) * 4;
-              if(data[idx+3] === 0) { // Si el píxel es transparente
-                if(px > 0 && data[idx-1] > 0) { data[idx]=data[idx-4]; data[idx+1]=data[idx-3]; data[idx+2]=data[idx-2]; }
-                else if(px < cw - 1 && data[idx+7] > 0) { data[idx]=data[idx+4]; data[idx+1]=data[idx+5]; data[idx+2]=data[idx+6]; }
-                else if(py > 0 && data[idx-rowW+3] > 0) { data[idx]=data[idx-rowW]; data[idx+1]=data[idx-rowW+1]; data[idx+2]=data[idx-rowW+2]; }
-                else if(py < ch - 1 && data[idx+rowW+3] > 0) { data[idx]=data[idx+rowW]; data[idx+1]=data[idx+rowW+1]; data[idx+2]=data[idx+rowW+2]; }
-              }
-            }
-          }
-          tempCtx.putImageData(imgData, 0, 0);
-
-          // 3. ENCOGER EN CALIDAD ESTUDIO (Sin mezclarlo con otros botones)
-          const shrinkC = document.createElement('canvas');
-          shrinkC.width = w / 2; shrinkC.height = h / 2;
-          const shrinkCtx = shrinkC.getContext('2d');
-          shrinkCtx.imageSmoothingEnabled = true; shrinkCtx.imageSmoothingQuality = 'high';
-          shrinkCtx.drawImage(tempC, 0, 0, w, h, 0, 0, w / 2, h / 2);
-          
-          // 4. PLISTEAR INTACTO (Lo pega en la coordenada dividida a la mitad, tal cual espera GD)
-          ctxDest.drawImage(shrinkC, x / 2, y / 2);
-        }
-        
-        // Regresamos el PNG limpio y el .plist convertido con tus matemáticas originales
-        cDest.toBlob((b) => res({ blob: b, plistStr: processData(plistText) }), 'image/png');
-      };
-    });
-  };
-
-  /* LECTOR INTELIGENTE (EMPAREJA PNG CON PLIST) */
-  document.getElementById('file').onchange = async (e) => {
-    const files = e.target.files; if(!files.length) return;
-    const zipOut = new JSZip(); st.innerText = "MÉTODO COLON PERFECTO (IN-PLACE)...";
-    sv.style.display = "none";
-    
-    for (let f of files) {
-      if (f.name.toLowerCase().endsWith('.zip')) {
-        const zipIn = await JSZip.loadAsync(f);
-        const processedPlists = new Set();
-        const zipFilesArr = Object.keys(zipIn.files).filter(p => !zipIn.files[p].dir && !p.includes('__MACOSX'));
-        
-        for (let path of zipFilesArr) {
-          const entry = zipIn.files[path];
-          let nPath = path.replace(/-uhd/gi, '-hd');
-          
-          if (path.toLowerCase().endsWith('.png')) {
-            const plistPath = path.replace(/\.png$/i, '.plist');
-            if (zipIn.files[plistPath]) {
-              const plistText = await zipIn.files[plistPath].async("string");
-              const outData = await processColonInPlace(await entry.async("blob"), plistText);
-              zipOut.file(nPath, outData.blob);
-              zipOut.file(plistPath.replace(/-uhd/gi, '-hd'), outData.plistStr);
-              processedPlists.add(plistPath);
-            } else {
-              zipOut.file(nPath, await resizeQuality(await entry.async("blob")));
-            }
-          } else if (path.match(/\.(plist|fnt)$/i)) {
-            if (!processedPlists.has(path)) zipOut.file(nPath, processData(await entry.async("string")));
-          } else {
-            zipOut.file(nPath, await entry.async("blob"));
-          }
-        }
-      } else {
-        let n = f.name.replace(/-uhd/gi, '-hd');
-        if (f.name.toLowerCase().endsWith('.png')) {
-           const filesArr = Array.from(files);
-           const plistName = f.name.replace(/\.png$/i, '.plist');
-           const plistFile = filesArr.find(x => x.name.toLowerCase() === plistName.toLowerCase());
-           if (plistFile) {
-              const plistText = await plistFile.text();
-              const outData = await processColonInPlace(f, plistText);
-              zipOut.file(n, outData.blob);
-              zipOut.file(plistName.replace(/-uhd/gi, '-hd'), outData.plistStr);
-           } else {
-              zipOut.file(n, await resizeQuality(f));
-           }
-        } else if (f.name.match(/\.(plist|fnt)$/i)) {
-           const isPaired = Array.from(files).some(x => x.name.toLowerCase() === f.name.replace(/\.plist$/i, '.png').toLowerCase());
-           if(!isPaired) zipOut.file(n, processData(await f.text()));
+        const rects = plistText.match(/\{\{\s*(\d+)\s*,\s*(\d+)\s*\}\s*,\s*\{\s*(\d+)\s*,\s*(\d+)\s*\}\}/g);
+        if (rects) {
+          rects.forEach(r => {
+            const m = r.match(/\d+/g).map(Number);
+            const [x, y, w, h] = m;
+            // Dibuja cada parte por separado reducida a la mitad
+            ctx.drawImage(img, x, y, w, h, x/2, y/2, w/2, h/2);
+          });
         } else {
-           zipOut.file(n, f);
+          ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, c.width, c.height);
+        }
+        c.toBlob(resolve, 'image/png');
+      };
+    });
+  };
+
+  document.getElementById('file').onchange = async (e) => {
+    const files = Array.from(e.target.files); if(!files.length) return;
+    const zipOut = new JSZip(); st.innerText = "DESPLISTEANDO Y ENCOGIENDO...";
+    
+    // Busca parejas .png y .plist
+    for (let f of files) {
+      if (f.name.endsWith('.png')) {
+        const plistName = f.name.replace('.png', '.plist');
+        const plistFile = files.find(p => p.name === plistName);
+        const outName = f.name.replace('-uhd', '-hd');
+        
+        if (plistFile) {
+          const pText = await plistFile.text();
+          const portedImg = await smartPort(f, pText);
+          zipOut.file(outName, portedImg);
+          zipOut.file(plistName.replace('-uhd', '-hd'), processPlist(pText));
+        } else {
+          // Si es un archivo suelto sin plist
+          const simpleImg = await smartPort(f, "");
+          zipOut.file(outName, simpleImg);
         }
       }
     }
-    
-    st.innerText = "¡MENÚS PERFECTOS SIN BORDES LISTOS!"; sv.style.display = "block";
+    st.innerText = "¡TODO LISTO!"; sv.style.display = "block";
     sv.onclick = async () => {
-      const content = await zipOut.generateAsync({type:"blob"});
-      const a = document.createElement("a"); a.href = URL.createObjectURL(content);
-      a.download = "TexturePack_Perfecto_By_Ketsu.zip"; a.click();
+      const blob = await zipOut.generateAsync({type:"blob"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = "Pack_HD_Perfecto.zip"; a.click();
     };
   };
 </script>
