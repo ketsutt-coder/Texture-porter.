@@ -159,7 +159,7 @@
   };
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
-  /* REESCRITURA MATEMÁTICA PARA FNT Y ARCHIVOS SUELTOS */
+  /* REESCRITURA MATEMÁTICA PARA PLIST (La original que siempre funcionó) */
   const processData = (txt) => {
     let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${parseFloat(x)/2},${parseFloat(y)/2}}`);
     const tags = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight', 'scaleW', 'scaleH'];
@@ -170,7 +170,7 @@
     return res.replace(/-uhd/gi, '-hd');
   };
 
-  /* REDIMENSIÓN BÁSICA (Para fondos sueltos que no tienen Plist) */
+  /* REDIMENSIÓN BÁSICA (Para fondos sueltos) */
   const resizeQuality = async (blob) => {
     return new Promise((res) => {
       const img = new Image(); img.src = URL.createObjectURL(blob);
@@ -186,165 +186,73 @@
   };
 
   /* =========================================================================
-   * 🔥 MOTOR TIPO GD COLON (UNPACK -> CLEAN -> SHRINK -> REPACK CON PADDING)
+   * 🔥 MOTOR COLON "IN-PLACE" (DESPLISTEA -> ENCOGE AISLADO -> PLISTEA EN SU LUGAR)
+   * ¡ESTO EVITA QUE LOS BOTONES ROTADOS SE CORTEN Y MANTIENE EL DISEÑO INTACTO!
    * ========================================================================= */
-  const processColonMethod = async (blob, plistText) => {
+  const processColonInPlace = async (blob, plistText) => {
     return new Promise((res) => {
       const img = new Image(); img.src = URL.createObjectURL(blob);
       img.onload = () => {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(plistText, "text/xml");
-        
-        let framesDict = null; let metaDict = null;
-        const rootChildren = xmlDoc.querySelector("plist > dict")?.children;
-        if(!rootChildren) return resizeQuality(blob).then(b => res({blob:b, plistStr: processData(plistText)}));
-        
-        for(let i=0; i<rootChildren.length; i+=2) {
-           if(rootChildren[i].textContent === 'frames') framesDict = rootChildren[i+1];
-           if(rootChildren[i].textContent === 'metadata') metaDict = rootChildren[i+1];
-        }
-        
-        if (!framesDict) return resizeQuality(blob).then(b => res({blob:b, plistStr: processData(plistText)}));
-        
-        const getVal = (node, key) => {
-           for(let i=0; i<node.children.length; i+=2) {
-              if(node.children[i].textContent === key) return node.children[i+1];
-           }
-           return null;
-        };
-        const parseRect = (str) => {
-           const m = str.match(/-?\d+\.?\d*/g);
-           return m ? { x: parseFloat(m[0]), y: parseFloat(m[1]), w: parseFloat(m[2]), h: parseFloat(m[3]) } : null;
-        };
-        
-        let sprites = [];
-        for (let i = 0; i < framesDict.children.length; i += 2) {
-           const spriteName = framesDict.children[i].textContent;
-           const spriteData = framesDict.children[i+1];
-           const rectNode = getVal(spriteData, 'textureRect') || getVal(spriteData, 'frame');
-           if(!rectNode) continue;
-           const rect = parseRect(rectNode.textContent);
-           if(rect.w === 0 || rect.h === 0) continue;
-           sprites.push({ name: spriteName, dataNode: spriteData, rect: rect, rectNode: rectNode });
-        }
-        
-        // Ordenar por tamaño para armar el lienzo tipo Tetris perfecto
-        sprites.sort((a,b) => b.rect.h - a.rect.h);
-        
-        const PADDING = 2; // ESPACIO CRUCIAL PARA MATAR EL SANGRADO
-        const MAX_WIDTH = Math.ceil(img.width / 2);
-        let currentX = 0; let currentY = 0; let currentRowHeight = 0;
-        let processedSprites = [];
-        
-        for (let sprite of sprites) {
-           const rect = sprite.rect;
-           const cw = Math.ceil(rect.w); const ch = Math.ceil(rect.h);
-           
-           // 1. DESPLISTEAR (Cortar con tijeras el botón)
-           const tempC = document.createElement('canvas');
-           tempC.width = cw; tempC.height = ch;
-           const tempCtx = tempC.getContext('2d', { willReadFrequently: true });
-           tempCtx.drawImage(img, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
-           
-           // 2. ALPHA BLEEDING AISLADO
-           const imgData = tempCtx.getImageData(0, 0, cw, ch);
-           const data = imgData.data; const rowW = cw * 4;
-           for(let y = 0; y < ch; y++) {
-             for(let x = 0; x < cw; x++) {
-               let idx = (y * cw + x) * 4;
-               if(data[idx+3] === 0) {
-                 if(x > 0 && data[idx-1] > 0) { data[idx]=data[idx-4]; data[idx+1]=data[idx-3]; data[idx+2]=data[idx-2]; }
-                 else if(x < cw - 1 && data[idx+7] > 0) { data[idx]=data[idx+4]; data[idx+1]=data[idx+5]; data[idx+2]=data[idx+6]; }
-                 else if(y > 0 && data[idx-rowW+3] > 0) { data[idx]=data[idx-rowW]; data[idx+1]=data[idx-rowW+1]; data[idx+2]=data[idx-rowW+2]; }
-                 else if(y < ch - 1 && data[idx+rowW+3] > 0) { data[idx]=data[idx+rowW]; data[idx+1]=data[idx+rowW+1]; data[idx+2]=data[idx+rowW+2]; }
-               }
-             }
-           }
-           tempCtx.putImageData(imgData, 0, 0);
-           
-           // 3. ENCOGER CALIDAD ESTUDIO
-           const shrinkW = rect.w / 2; const shrinkH = rect.h / 2;
-           const shrinkCanvasW = Math.ceil(shrinkW); const shrinkCanvasH = Math.ceil(shrinkH);
-           
-           const shrinkC = document.createElement('canvas');
-           shrinkC.width = shrinkCanvasW; shrinkC.height = shrinkCanvasH;
-           const shrinkCtx = shrinkC.getContext('2d');
-           shrinkCtx.imageSmoothingEnabled = true; shrinkCtx.imageSmoothingQuality = 'high';
-           shrinkCtx.drawImage(tempC, 0, 0, rect.w, rect.h, 0, 0, shrinkW, shrinkH);
-           
-           // 4. ALGORITMO BIN-PACKER (TETRIS)
-           if (currentX + shrinkCanvasW + PADDING > MAX_WIDTH && currentX > 0) {
-              currentX = 0; currentY += currentRowHeight + PADDING; currentRowHeight = 0;
-           }
-           
-           sprite.newX = currentX; sprite.newY = currentY;
-           sprite.newW = shrinkW; sprite.newH = shrinkH; sprite.canvas = shrinkC;
-           
-           currentX += shrinkCanvasW + PADDING;
-           currentRowHeight = Math.max(currentRowHeight, shrinkCanvasH);
-           processedSprites.push(sprite);
-        }
-        
-        // 5. EMPAQUETAR Y CREAR NUEVO XML EXACTO
-        const finalWidth = MAX_WIDTH;
-        const finalHeight = currentY + currentRowHeight + PADDING;
         const cDest = document.createElement('canvas');
-        cDest.width = finalWidth; cDest.height = finalHeight;
+        cDest.width = Math.floor(img.width / 2); cDest.height = Math.floor(img.height / 2);
         const ctxDest = cDest.getContext('2d');
         
-        const parseSize = (str) => {
-           const m = str.match(/-?\d+\.?\d*/g);
-           return m ? { w: parseFloat(m[0]), h: parseFloat(m[1]) } : null;
-        };
+        // Expresión para leer TODAS las cajas de coordenadas (textureRect o frame)
+        const frameRegex = /<key>(?:frame|textureRect)<\/key>\s*<string>\{\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\},\s*\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}\}<\/string>/g;
+        let match;
         
-        for (let sprite of processedSprites) {
-           ctxDest.drawImage(sprite.canvas, sprite.newX, sprite.newY);
-           sprite.rectNode.textContent = `{{${sprite.newX},${sprite.newY}},{${sprite.newW},${sprite.newH}}}`;
-           
-           const nodeNames = ['spriteOffset', 'offset', 'spriteSize', 'sourceSize', 'spriteSourceSize'];
-           for (let nn of nodeNames) {
-              const n = getVal(sprite.dataNode, nn);
-              if (n) {
-                 const sz = parseSize(n.textContent);
-                 if (sz) n.textContent = `{${sz.w / 2},${sz.h / 2}}`;
+        while((match = frameRegex.exec(plistText)) !== null) {
+          const x = parseFloat(match[1]); const y = parseFloat(match[2]);
+          const w = parseFloat(match[3]); const h = parseFloat(match[4]);
+          if(w === 0 || h === 0) continue;
+
+          const cw = Math.ceil(w); const ch = Math.ceil(h);
+          
+          // 1. DESPLISTEAR (Cortar el botón con tijeras en su tamaño original)
+          const tempC = document.createElement('canvas');
+          tempC.width = cw; tempC.height = ch;
+          const tempCtx = tempC.getContext('2d', { willReadFrequently: true });
+          tempCtx.drawImage(img, x, y, w, h, 0, 0, w, h);
+          
+          // 2. BLEEDING AISLADO (Contagia colores para que al encoger NO haya líneas negras)
+          const imgData = tempCtx.getImageData(0, 0, cw, ch);
+          const data = imgData.data; const rowW = cw * 4;
+          for(let py = 0; py < ch; py++) {
+            for(let px = 0; px < cw; px++) {
+              let idx = (py * cw + px) * 4;
+              if(data[idx+3] === 0) { // Si el píxel es transparente
+                if(px > 0 && data[idx-1] > 0) { data[idx]=data[idx-4]; data[idx+1]=data[idx-3]; data[idx+2]=data[idx-2]; }
+                else if(px < cw - 1 && data[idx+7] > 0) { data[idx]=data[idx+4]; data[idx+1]=data[idx+5]; data[idx+2]=data[idx+6]; }
+                else if(py > 0 && data[idx-rowW+3] > 0) { data[idx]=data[idx-rowW]; data[idx+1]=data[idx-rowW+1]; data[idx+2]=data[idx-rowW+2]; }
+                else if(py < ch - 1 && data[idx+rowW+3] > 0) { data[idx]=data[idx+rowW]; data[idx+1]=data[idx+rowW+1]; data[idx+2]=data[idx+rowW+2]; }
               }
-           }
-           const cRect = getVal(sprite.dataNode, 'sourceColorRect');
-           if (cRect) {
-              const cr = parseRect(cRect.textContent);
-              if (cr) cRect.textContent = `{{${cr.x / 2},${cr.y / 2}},{${cr.w / 2},${cr.h / 2}}}`;
-           }
+            }
+          }
+          tempCtx.putImageData(imgData, 0, 0);
+
+          // 3. ENCOGER EN CALIDAD ESTUDIO (Sin mezclarlo con otros botones)
+          const shrinkC = document.createElement('canvas');
+          shrinkC.width = w / 2; shrinkC.height = h / 2;
+          const shrinkCtx = shrinkC.getContext('2d');
+          shrinkCtx.imageSmoothingEnabled = true; shrinkCtx.imageSmoothingQuality = 'high';
+          shrinkCtx.drawImage(tempC, 0, 0, w, h, 0, 0, w / 2, h / 2);
+          
+          // 4. PLISTEAR INTACTO (Lo pega en la coordenada dividida a la mitad, tal cual espera GD)
+          ctxDest.drawImage(shrinkC, x / 2, y / 2);
         }
         
-        if (metaDict) {
-           const sizeNode = getVal(metaDict, 'size');
-           if (sizeNode) sizeNode.textContent = `{${finalWidth},${finalHeight}}`;
-           const texNode = getVal(metaDict, 'textureFileName');
-           if (texNode) texNode.textContent = texNode.textContent.replace(/-uhd/gi, '-hd');
-           const realTexNode = getVal(metaDict, 'realTextureFileName');
-           if (realTexNode) realTexNode.textContent = realTexNode.textContent.replace(/-uhd/gi, '-hd');
-        }
-        
-        const serializer = new XMLSerializer();
-        let newPlistStr = serializer.serializeToString(xmlDoc);
-        newPlistStr = newPlistStr.replace(/<\?xml.*\?>/i, '').replace(/<!DOCTYPE.*?>/i, '');
-        const header = `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n`;
-        newPlistStr = header + newPlistStr.trim();
-        
-        cDest.toBlob((b) => res({ blob: b, plistStr: newPlistStr }), 'image/png');
+        // Regresamos el PNG limpio y el .plist convertido con tus matemáticas originales
+        cDest.toBlob((b) => res({ blob: b, plistStr: processData(plistText) }), 'image/png');
       };
     });
   };
 
-  /* ==========================================================
-   * LECTOR INTELIGENTE DE ARCHIVOS (EMPAREJA PNG CON PLIST)
-   * ========================================================== */
+  /* LECTOR INTELIGENTE (EMPAREJA PNG CON PLIST) */
   document.getElementById('file').onchange = async (e) => {
     const files = e.target.files; if(!files.length) return;
-    const zipOut = new JSZip(); st.innerText = "MÉTODO COLON: DESPLISTEANDO, LIMPIANDO Y EMPAQUETANDO...";
+    const zipOut = new JSZip(); st.innerText = "MÉTODO COLON PERFECTO (IN-PLACE)...";
     sv.style.display = "none";
     
-    // Si subes un ZIP
     for (let f of files) {
       if (f.name.toLowerCase().endsWith('.zip')) {
         const zipIn = await JSZip.loadAsync(f);
@@ -359,7 +267,7 @@
             const plistPath = path.replace(/\.png$/i, '.plist');
             if (zipIn.files[plistPath]) {
               const plistText = await zipIn.files[plistPath].async("string");
-              const outData = await processColonMethod(await entry.async("blob"), plistText);
+              const outData = await processColonInPlace(await entry.async("blob"), plistText);
               zipOut.file(nPath, outData.blob);
               zipOut.file(plistPath.replace(/-uhd/gi, '-hd'), outData.plistStr);
               processedPlists.add(plistPath);
@@ -373,7 +281,6 @@
           }
         }
       } else {
-        // Si subes archivos sueltos
         let n = f.name.replace(/-uhd/gi, '-hd');
         if (f.name.toLowerCase().endsWith('.png')) {
            const filesArr = Array.from(files);
@@ -381,7 +288,7 @@
            const plistFile = filesArr.find(x => x.name.toLowerCase() === plistName.toLowerCase());
            if (plistFile) {
               const plistText = await plistFile.text();
-              const outData = await processColonMethod(f, plistText);
+              const outData = await processColonInPlace(f, plistText);
               zipOut.file(n, outData.blob);
               zipOut.file(plistName.replace(/-uhd/gi, '-hd'), outData.plistStr);
            } else {
@@ -396,11 +303,11 @@
       }
     }
     
-    st.innerText = "¡MENÚS PERFECTOS (SIN BORDES) LISTOS!"; sv.style.display = "block";
+    st.innerText = "¡MENÚS PERFECTOS SIN BORDES LISTOS!"; sv.style.display = "block";
     sv.onclick = async () => {
       const content = await zipOut.generateAsync({type:"blob"});
       const a = document.createElement("a"); a.href = URL.createObjectURL(content);
-      a.download = "TexturePack_Perfect_By_Ketsu.zip"; a.click();
+      a.download = "TexturePack_Perfecto_By_Ketsu.zip"; a.click();
     };
   };
 </script>
