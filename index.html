@@ -23,48 +23,41 @@
       --sub-text: rgba(255, 255, 255, 0.5);
     }
     body { 
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; 
       margin: 0; padding: 0; min-height: 100vh;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       color: var(--text); overflow: hidden;
     }
 
     .custom-bg {
-      position: fixed; top: -30px; left: -30px; right: -30px;
-      bottom: -30px; 
+      position: fixed; top: -30px; left: -30px; right: -30px; bottom: -30px; 
       background-image: url('fondo.jpg'); background-size: cover;
       background-position: center; filter: blur(10px); z-index: -2;
     }
     .bg-overlay {
-      position: fixed; top: 0; left: 0; width: 100%;
-      height: 100%;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: var(--bg-overlay); z-index: -1; transition: background 0.5s ease;
     }
 
     .top-controls {
       display: flex; justify-content: space-between; align-items: center; 
-      width: 85%;
-      max-width: 350px; margin-bottom: 20px; z-index: 10;
+      width: 85%; max-width: 350px; margin-bottom: 20px; z-index: 10;
     }
     .btn-top {
-      background: var(--glass);
-      border: 1px solid var(--border); 
+      background: var(--glass); border: 1px solid var(--border); 
       width: 50px; height: 50px; border-radius: 50%; cursor: pointer; 
       backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-      display: flex; align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s ease;
     }
     .btn-top:active { transform: scale(0.92); }
     .btn-top svg { fill: var(--text); }
 
     .contenedor {
-      background: var(--glass);
-      backdrop-filter: blur(35px) saturate(180%);
+      background: var(--glass); backdrop-filter: blur(35px) saturate(180%);
       -webkit-backdrop-filter: blur(35px) saturate(180%);
       border: 1px solid var(--border); border-radius: 40px;
-      padding: 30px 25px; width: 85%; max-width: 350px;
-      text-align: center;
+      padding: 30px 25px; width: 85%; max-width: 350px; text-align: center;
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
 
@@ -79,23 +72,20 @@
     h1 { font-size: 20px; font-weight: 800; letter-spacing: -1px; margin: 5px 0; }
     
     .drop-zone {
-      background: rgba(128,128,128,0.05);
-      border: 1px dashed var(--sub-text);
+      background: rgba(128,128,128,0.05); border: 1px dashed var(--sub-text);
       border-radius: 30px; padding: 40px 20px; cursor: pointer; display: block; margin-top: 15px;
       transition: transform 0.2s;
     }
     .drop-zone:active { transform: scale(0.98); }
     #status { font-size: 11px; color: var(--music-pink); margin-top: 20px; font-weight: 800; }
     #saveBtn {
-      background: var(--music-pink); color: #ffffff; border: none;
-      padding: 18px; border-radius: 24px; 
+      background: var(--music-pink); color: #ffffff; border: none; padding: 18px; border-radius: 24px; 
       width: 100%; font-weight: 800; margin-top: 20px; display: none; cursor: pointer;
     }
 
     .mini-player {
       margin-top: 20px; background: var(--glass); border-radius: 30px;
-      padding: 18px 25px;
-      width: 85%; max-width: 350px; border: 1px solid var(--border);
+      padding: 18px 25px; width: 85%; max-width: 350px; border: 1px solid var(--border);
       display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(35px) saturate(180%);
       -webkit-backdrop-filter: blur(35px) saturate(180%);
     }
@@ -105,8 +95,7 @@
 
     .social-bar { margin-top: 20px; display: flex; gap: 12px; width: 85%; max-width: 350px; }
     .social-btn {
-      flex: 1;
-      background: var(--glass); border: 1px solid var(--border); padding: 14px; border-radius: 22px;
+      flex: 1; background: var(--glass); border: 1px solid var(--border); padding: 14px; border-radius: 22px;
       text-decoration: none; color: var(--text); font-size: 13px; font-weight: 700;
       display: flex; align-items: center; justify-content: center; gap: 8px;
     }
@@ -155,23 +144,22 @@
 </div>
 
 <script>
-  /* Interfaz y Audio (INTACTO) */
+  /* Interfaz y Audio */
   const body = document.getElementById('mainBody'); const audio = document.getElementById('audio');
-  const st = document.getElementById('status');
-  const sv = document.getElementById('saveBtn');
+  const st = document.getElementById('status'); const sv = document.getElementById('saveBtn');
   const mIco = document.getElementById('m-ico'); const pIco = document.getElementById('p-ico');
   const pBtn = document.getElementById('btnPlay');
   
   document.getElementById('themeBtn').onclick = () => body.classList.toggle('dark-mode');
   function playMusic() { audio.play().then(() => pIco.setAttribute('d', "M6 19h4V5H6v14zm8-14v14h4V5h-4z")).catch(()=>{}); }
   pBtn.onclick = () => { if(audio.paused) playMusic(); else { audio.pause(); pIco.setAttribute('d', "M8 5v14l11-7z"); } };
-  
   document.getElementById('btnMute').onclick = () => { 
     audio.muted = !audio.muted;
     mIco.setAttribute('d', audio.muted ? "M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" : "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z");
   };
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
+  /* * CORRECCIÓN 1: Matemáticas de Coordenadas */
   const processData = (txt) => {
     let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${parseFloat(x)/2},${parseFloat(y)/2}}`);
     const tags = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight', 'scaleW', 'scaleH'];
@@ -182,7 +170,7 @@
     return res.replace(/-uhd/gi, '-hd');
   };
 
-  /* * CORRECCIÓN 2: ALPHA BLEEDING PARA BORDES PERFECTOS (ADIÓS LÍNEAS NEGRAS/BLANCAS) */
+  /* * CORRECCIÓN 2: ESCÁNER DE ALPHA BLEEDING (ADIÓS LÍNEAS NEGRAS/BLANCAS EN MENÚS) */
   const resizeQuality = async (blob) => {
     return new Promise((res) => {
       const img = new Image(); img.src = URL.createObjectURL(blob);
@@ -194,24 +182,30 @@
         
         const imgData = ctxOrig.getImageData(0, 0, cOrig.width, cOrig.height);
         const data = imgData.data;
+        const outData = new Uint8ClampedArray(data); // Creamos copia para no manchar en bucle
         const w = cOrig.width * 4;
 
-        // ALPHA BLEEDING: Contagia el color del icono al fondo transparente
-        for(let i = 0; i < data.length; i += 4) {
-          if(data[i+3] === 0) { // Si es transparente
-            // Copia el color del píxel más cercano (izq, der, arriba o abajo)
-            if (i >= 4 && data[i-1] > 0) { data[i] = data[i-4]; data[i+1] = data[i-3]; data[i+2] = data[i-2]; }
-            else if (i+7 < data.length && data[i+7] > 0) { data[i] = data[i+4]; data[i+1] = data[i+5]; data[i+2] = data[i+6]; }
-            else if (i >= w && data[i-w+3] > 0) { data[i] = data[i-w]; data[i+1] = data[i-w+1]; data[i+2] = data[i-w+2]; }
-            else if (i+w+3 < data.length && data[i+w+3] > 0) { data[i] = data[i+w]; data[i+1] = data[i+w+1]; data[i+2] = data[i+w+2]; }
+        // Magia: Estiramos los colores a los píxeles invisibles
+        for(let y = 0; y < cOrig.height; y++) {
+          for(let x = 0; x < cOrig.width; x++) {
+            let i = (y * cOrig.width + x) * 4;
+            if(data[i+3] === 0) { // Si el píxel es transparente
+              // Revisa los vecinos y les roba el color (izq, der, arriba, abajo)
+              if(x > 0 && data[i-1] > 0) { outData[i] = data[i-4]; outData[i+1] = data[i-3]; outData[i+2] = data[i-2]; }
+              else if(x < cOrig.width - 1 && data[i+7] > 0) { outData[i] = data[i+4]; outData[i+1] = data[i+5]; outData[i+2] = data[i+6]; }
+              else if(y > 0 && data[i - w + 3] > 0) { outData[i] = data[i - w]; outData[i+1] = data[i - w + 1]; outData[i+2] = data[i - w + 2]; }
+              else if(y < cOrig.height - 1 && data[i + w + 3] > 0) { outData[i] = data[i + w]; outData[i+1] = data[i + w + 1]; outData[i+2] = data[i + w + 2]; }
+            }
           }
         }
+        
+        // Guardamos el color estirado en la imagen original
+        imgData.data.set(outData);
         ctxOrig.putImageData(imgData, 0, 0);
 
-        // Achicamos a 60x60 forzando la máxima calidad del celular
+        // Achicamos a 60x60 forzando calidad de estudio de la PC
         const cDest = document.createElement('canvas');
-        cDest.width = Math.floor(img.width / 2); 
-        cDest.height = Math.floor(img.height / 2);
+        cDest.width = Math.floor(img.width / 2); cDest.height = Math.floor(img.height / 2);
         const ctxDest = cDest.getContext('2d');
         
         ctxDest.imageSmoothingEnabled = true;
@@ -225,15 +219,13 @@
 
   document.getElementById('file').onchange = async (e) => {
     const files = e.target.files; if(!files.length) return;
-    const zipOut = new JSZip();
-    st.innerText = "LIMPIANDO Y PORTEANDO A HD 60x60...";
+    const zipOut = new JSZip(); st.innerText = "LIMPIANDO Y PORTEANDO...";
     
     for (let f of files) {
       if (f.name.toLowerCase().endsWith('.zip')) {
         const zipIn = await JSZip.loadAsync(f);
         for (let path in zipIn.files) {
-          const entry = zipIn.files[path];
-          if(entry.dir || path.includes('__MACOSX')) continue;
+          const entry = zipIn.files[path]; if(entry.dir || path.includes('__MACOSX')) continue;
           let nPath = path.replace(/-uhd/gi, '-hd');
           if (path.toLowerCase().endsWith('.png')) zipOut.file(nPath, await resizeQuality(await entry.async("blob")));
           else if (path.match(/\.(plist|fnt)$/i)) zipOut.file(nPath, processData(await entry.async("string")));
@@ -244,13 +236,12 @@
         if (f.name.toLowerCase().endsWith('.png')) zipOut.file(n, await resizeQuality(f));
         else if (f.name.match(/\.(plist|fnt)$/i)) zipOut.file(n, processData(await f.text()));
         else zipOut.file(n, f);
-        }
+      }
     }
-    st.innerText = "¡TODO LISTO EN CALIDAD HD!"; sv.style.display = "block";
+    st.innerText = "¡TODO LISTO!"; sv.style.display = "block";
     sv.onclick = async () => {
       const content = await zipOut.generateAsync({type:"blob"});
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(content);
+      const a = document.createElement("a"); a.href = URL.createObjectURL(content);
       a.download = "TexturePack_Perfect_HD_By_Ketsu.zip"; a.click();
     };
   };
