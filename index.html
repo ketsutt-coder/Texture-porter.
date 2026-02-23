@@ -144,7 +144,7 @@
 </div>
 
 <script>
-  /* Interfaz y Audio */
+  /* Interfaz y Audio (INTACTO) */
   const body = document.getElementById('mainBody'); const audio = document.getElementById('audio');
   const st = document.getElementById('status'); const sv = document.getElementById('saveBtn');
   const mIco = document.getElementById('m-ico'); const pIco = document.getElementById('p-ico');
@@ -159,7 +159,6 @@
   };
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
-  /* * CORRECCIÓN 1: Matemáticas de Coordenadas */
   const processData = (txt) => {
     let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${parseFloat(x)/2},${parseFloat(y)/2}}`);
     const tags = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight', 'scaleW', 'scaleH'];
@@ -170,81 +169,20 @@
     return res.replace(/-uhd/gi, '-hd');
   };
 
-  /* * CORRECCIÓN 2: ESCÁNER DE ALPHA BLEEDING (ADIÓS LÍNEAS NEGRAS/BLANCAS EN MENÚS) */
-  const resizeQuality = async (blob) => {
+  /* =======================================================
+   * EL MÉTODO GD COLON (DESPLISTEAR -> ENCOGER -> PLISTEAR)
+   * ======================================================= */
+  const processColonMethod = async (blob, plistText) => {
     return new Promise((res) => {
       const img = new Image(); img.src = URL.createObjectURL(blob);
       img.onload = () => {
-        const cOrig = document.createElement('canvas');
-        cOrig.width = img.width; cOrig.height = img.height;
-        const ctxOrig = cOrig.getContext('2d', { willReadFrequently: true });
-        ctxOrig.drawImage(img, 0, 0);
-        
-        const imgData = ctxOrig.getImageData(0, 0, cOrig.width, cOrig.height);
-        const data = imgData.data;
-        const outData = new Uint8ClampedArray(data); // Creamos copia para no manchar en bucle
-        const w = cOrig.width * 4;
-
-        // Magia: Estiramos los colores a los píxeles invisibles
-        for(let y = 0; y < cOrig.height; y++) {
-          for(let x = 0; x < cOrig.width; x++) {
-            let i = (y * cOrig.width + x) * 4;
-            if(data[i+3] === 0) { // Si el píxel es transparente
-              // Revisa los vecinos y les roba el color (izq, der, arriba, abajo)
-              if(x > 0 && data[i-1] > 0) { outData[i] = data[i-4]; outData[i+1] = data[i-3]; outData[i+2] = data[i-2]; }
-              else if(x < cOrig.width - 1 && data[i+7] > 0) { outData[i] = data[i+4]; outData[i+1] = data[i+5]; outData[i+2] = data[i+6]; }
-              else if(y > 0 && data[i - w + 3] > 0) { outData[i] = data[i - w]; outData[i+1] = data[i - w + 1]; outData[i+2] = data[i - w + 2]; }
-              else if(y < cOrig.height - 1 && data[i + w + 3] > 0) { outData[i] = data[i + w]; outData[i+1] = data[i + w + 1]; outData[i+2] = data[i + w + 2]; }
-            }
-          }
-        }
-        
-        // Guardamos el color estirado en la imagen original
-        imgData.data.set(outData);
-        ctxOrig.putImageData(imgData, 0, 0);
-
-        // Achicamos a 60x60 forzando calidad de estudio de la PC
+        // Lienzo final transparente donde se pegarán los menús
         const cDest = document.createElement('canvas');
         cDest.width = Math.floor(img.width / 2); cDest.height = Math.floor(img.height / 2);
         const ctxDest = cDest.getContext('2d');
         
-        ctxDest.imageSmoothingEnabled = true;
-        ctxDest.imageSmoothingQuality = 'high';
-        ctxDest.drawImage(cOrig, 0, 0, cDest.width, cDest.height);
+        // Expresión para leer las coordenadas del .plist
+        const frameRegex = /<key>(?:frame|textureRect)<\/key>\s*<string>\{\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\},\s*\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}\}<\/string>/g;
+        let match;
         
-        cDest.toBlob(res, 'image/png');
-      };
-    });
-  };
-
-  document.getElementById('file').onchange = async (e) => {
-    const files = e.target.files; if(!files.length) return;
-    const zipOut = new JSZip(); st.innerText = "LIMPIANDO Y PORTEANDO...";
-    
-    for (let f of files) {
-      if (f.name.toLowerCase().endsWith('.zip')) {
-        const zipIn = await JSZip.loadAsync(f);
-        for (let path in zipIn.files) {
-          const entry = zipIn.files[path]; if(entry.dir || path.includes('__MACOSX')) continue;
-          let nPath = path.replace(/-uhd/gi, '-hd');
-          if (path.toLowerCase().endsWith('.png')) zipOut.file(nPath, await resizeQuality(await entry.async("blob")));
-          else if (path.match(/\.(plist|fnt)$/i)) zipOut.file(nPath, processData(await entry.async("string")));
-          else zipOut.file(nPath, await entry.async("blob"));
-        }
-      } else {
-        let n = f.name.replace(/-uhd/gi, '-hd');
-        if (f.name.toLowerCase().endsWith('.png')) zipOut.file(n, await resizeQuality(f));
-        else if (f.name.match(/\.(plist|fnt)$/i)) zipOut.file(n, processData(await f.text()));
-        else zipOut.file(n, f);
-      }
-    }
-    st.innerText = "¡TODO LISTO!"; sv.style.display = "block";
-    sv.onclick = async () => {
-      const content = await zipOut.generateAsync({type:"blob"});
-      const a = document.createElement("a"); a.href = URL.createObjectURL(content);
-      a.download = "TexturePack_Perfect_HD_By_Ketsu.zip"; a.click();
-    };
-  };
-</script>
-</body>
-</html>
+        while((match = frameRegex.exec(plistText)) !== null)
