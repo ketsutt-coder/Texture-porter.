@@ -68,7 +68,8 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
 
-    .profile-section { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
+    .profile-section { display: flex; flex-direction: column; align-items: center;
+      margin-bottom: 20px; }
     .profile-pic {
       width: 85px; height: 85px; border-radius: 50%;
       border: 3px solid var(--music-pink); object-fit: cover;
@@ -85,7 +86,8 @@
       transition: transform 0.2s;
     }
     .drop-zone:active { transform: scale(0.98); }
-    #status { font-size: 11px; color: var(--music-pink); margin-top: 20px; font-weight: 800; }
+    #status { font-size: 11px; color: var(--music-pink); margin-top: 20px;
+      font-weight: 800; }
     #saveBtn {
       background: var(--music-pink); color: #ffffff; border: none;
       padding: 18px; border-radius: 24px; 
@@ -103,12 +105,14 @@
     .btn-svg svg { fill: var(--text); width: 22px; height: 22px; }
     #btnPlay svg { width: 32px; height: 32px; }
 
-    .social-bar { margin-top: 20px; display: flex; gap: 12px; width: 85%; max-width: 350px; }
+    .social-bar { margin-top: 20px;
+      display: flex; gap: 12px; width: 85%; max-width: 350px; }
     .social-btn {
       flex: 1;
       background: var(--glass); border: 1px solid var(--border); padding: 14px; border-radius: 22px;
       text-decoration: none; color: var(--text); font-size: 13px; font-weight: 700;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
+      display: flex;
+      align-items: center; justify-content: center; gap: 8px;
     }
   </style>
 </head>
@@ -155,7 +159,7 @@
 </div>
 
 <script>
-  /* Interfaz y Audio (LÓGICA ORIGINAL) */
+  /* Interfaz y Audio (TU CÓDIGO ORIGINAL) */
   const body = document.getElementById('mainBody'); const audio = document.getElementById('audio');
   const st = document.getElementById('status');
   const sv = document.getElementById('saveBtn');
@@ -172,7 +176,7 @@
   };
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
-  /* CORRECCIÓN 1: Matemáticas de Coordenadas (TU LÓGICA ORIGINAL) */
+  /* TU MATEMÁTICA EXACTA PARA EL PLIST (ESTO EVITA QUE SE ROMPAN LOS FONDOS) */
   const processData = (txt) => {
     let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${parseFloat(x)/2},${parseFloat(y)/2}}`);
     const tags = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight', 'scaleW', 'scaleH'];
@@ -183,20 +187,34 @@
     return res.replace(/-uhd/gi, '-hd');
   };
 
-  /* GD COLÓN ALGORITHM: SEPARAR Y REDIMENSIONAR SPRITES */
+  /* SOLUCIÓN AL SANGRADO BLANCO: CORTAR Y PEGAR EN EL MISMO LUGAR */
   const resizeQuality = async (blob, plistText = null) => {
     return new Promise((res) => {
       const img = new Image(); img.src = URL.createObjectURL(blob);
       img.onload = () => {
+        // Lienzo HD Destino (mitad de tamaño)
         const cDest = document.createElement('canvas');
         cDest.width = Math.floor(img.width / 2); cDest.height = Math.floor(img.height / 2);
         const ctxDest = cDest.getContext('2d');
         ctxDest.imageSmoothingEnabled = true;
         ctxDest.imageSmoothingQuality = 'high';
 
+        // Tu escáner original para limpiar pixeles transparentes (anti-líneas)
+        const cOrig = document.createElement('canvas');
+        cOrig.width = img.width; cOrig.height = img.height;
+        const ctxOrig = cOrig.getContext('2d', { willReadFrequently: true });
+        ctxOrig.drawImage(img, 0, 0);
+        
+        const imgData = ctxOrig.getImageData(0, 0, cOrig.width, cOrig.height);
+        const data = imgData.data;
+        for(let i = 0; i < data.length; i += 4) {
+          if(data[i+3] === 0) { data[i] = 0; data[i+1] = 0; data[i+2] = 0; }
+        }
+        ctxOrig.putImageData(imgData, 0, 0);
+
         if (plistText) {
-          // Método GD Colón: recorta cada sprite individualmente usando el Plist original
-          const frameRegex = /<key>(?:frame|textureRect)<\/key>\s*<string>\{\{\s*([-+]?\d+)\s*,\s*([-+]?\d+)\s*\},\s*\{\s*([-+]?\d+)\s*,\s*([-+]?\d+)\s*\}\}<\/string>/g;
+          // Si hay Plist, aplicamos el método GD Colón: Aislar sprite por sprite
+          const frameRegex = /<key>(?:frame|textureRect)<\/key>\s*<string>\{\{\s*([-+]?\d+)\s*,\s*([-+]?\d+)\s*\}\s*,\s*\{\s*([-+]?\d+)\s*,\s*([-+]?\d+)\s*\}\}<\/string>/g;
           let match;
           let foundSprites = false;
           
@@ -209,36 +227,17 @@
             
             if (w === 0 || h === 0) continue;
             
-            // 1. Extraemos el sprite individual del lienzo UHD a un canvas temporal (Esto evita el bleeding/manchado)
-            const tempC = document.createElement('canvas');
-            tempC.width = w; tempC.height = h;
-            const tempCtx = tempC.getContext('2d');
-            tempCtx.drawImage(img, x, y, w, h, 0, 0, w, h);
-            
-            // 2. Lo achicamos y lo ponemos en la posición exacta del lienzo HD (x/2, y/2)
-            ctxDest.drawImage(tempC, 0, 0, w, h, x/2, y/2, w/2, h/2);
+            // Dibuja SOLAMENTE el sprite aislado, encogiéndolo a su posición exacta. 
+            // Así evitamos que los píxeles de un botón se manchen con los del botón de al lado.
+            ctxDest.drawImage(cOrig, x, y, w, h, x / 2, y / 2, w / 2, h / 2);
           }
           
-          // Si por alguna razón el plist falló y no encontró sprites, usa el método normal
           if (!foundSprites) {
-            ctxDest.drawImage(img, 0, 0, cDest.width, cDest.height);
+            // Respaldo por si falla la lectura
+            ctxDest.drawImage(cOrig, 0, 0, cDest.width, cDest.height);
           }
-
         } else {
-          // TU LÓGICA ORIGINAL: Escáner Anti-Sangrado Blanco para imágenes sueltas (Sin Plist)
-          const cOrig = document.createElement('canvas');
-          cOrig.width = img.width; cOrig.height = img.height;
-          const ctxOrig = cOrig.getContext('2d', { willReadFrequently: true });
-          ctxOrig.drawImage(img, 0, 0);
-          
-          const imgData = ctxOrig.getImageData(0, 0, cOrig.width, cOrig.height);
-          const data = imgData.data;
-          for(let i = 0; i < data.length; i += 4) {
-            if(data[i+3] === 0) { 
-              data[i] = 0; data[i+1] = 0; data[i+2] = 0; 
-            }
-          }
-          ctxOrig.putImageData(imgData, 0, 0);
+          // Si no hay Plist (Fondos, iconos sueltos), se encoge normal
           ctxDest.drawImage(cOrig, 0, 0, cDest.width, cDest.height);
         }
         
@@ -247,9 +246,9 @@
     });
   };
 
-  /* PROCESAMIENTO DE ARCHIVOS (Con pase de .plist al motor GD Colón) */
+  /* TU CICLO ORIGINAL DE ARCHIVOS INTACTO */
   document.getElementById('file').onchange = async (e) => {
-    const files = e.target.files; if(!files.length) return;
+    const files = Array.from(e.target.files); if(!files.length) return;
     const zipOut = new JSZip(); st.innerText = "LIMPIANDO Y PORTEANDO...";
     
     for (let f of files) {
@@ -259,14 +258,14 @@
           const entry = zipIn.files[path]; if(entry.dir || path.includes('__MACOSX')) continue;
           let nPath = path.replace(/-uhd/gi, '-hd');
           
-          // Si es una imagen, buscamos si tiene su .plist dentro del ZIP para enviarlo a resizeQuality
           if (path.toLowerCase().endsWith('.png')) {
+            // Buscamos su Plist y lo enviamos a la función
             let plistPath = path.replace(/\.png$/i, '.plist');
-            let plistText = null;
+            let pText = null;
             if (zipIn.files[plistPath]) {
-              plistText = await zipIn.files[plistPath].async("string");
+              pText = await zipIn.files[plistPath].async("string");
             }
-            zipOut.file(nPath, await resizeQuality(await entry.async("blob"), plistText));
+            zipOut.file(nPath, await resizeQuality(await entry.async("blob"), pText));
           } 
           else if (path.match(/\.(plist|fnt)$/i)) {
             zipOut.file(nPath, processData(await entry.async("string")));
@@ -276,13 +275,12 @@
           }
         }
       } else {
-        // Archivos sueltos fuera del ZIP
         let n = f.name.replace(/-uhd/gi, '-hd');
         if (f.name.toLowerCase().endsWith('.png')) {
           let plistName = f.name.replace(/\.png$/i, '.plist');
-          let plistFile = Array.from(files).find(file => file.name === plistName);
-          let plistText = plistFile ? await plistFile.text() : null;
-          zipOut.file(n, await resizeQuality(f, plistText));
+          let pFile = files.find(x => x.name === plistName);
+          let pText = pFile ? await pFile.text() : null;
+          zipOut.file(n, await resizeQuality(f, pText));
         } 
         else if (f.name.match(/\.(plist|fnt)$/i)) {
           zipOut.file(n, processData(await f.text()));
