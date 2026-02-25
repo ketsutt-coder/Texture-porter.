@@ -68,8 +68,7 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
 
-    .profile-section { display: flex; flex-direction: column; align-items: center;
-      margin-bottom: 20px; }
+    .profile-section { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
     .profile-pic {
       width: 85px; height: 85px; border-radius: 50%;
       border: 3px solid var(--music-pink); object-fit: cover;
@@ -156,28 +155,27 @@
 </div>
 
 <script>
-  /* Interfaz y Audio */
   const body = document.getElementById('mainBody'); const audio = document.getElementById('audio');
-  const st = document.getElementById('status');
-  const sv = document.getElementById('saveBtn');
+  const st = document.getElementById('status'); const sv = document.getElementById('saveBtn');
   const mIco = document.getElementById('m-ico'); const pIco = document.getElementById('p-ico');
   const pBtn = document.getElementById('btnPlay');
   
   document.getElementById('themeBtn').onclick = () => body.classList.toggle('dark-mode');
   function playMusic() { audio.play().then(() => pIco.setAttribute('d', "M6 19h4V5H6v14zm8-14v14h4V5h-4z")).catch(()=>{}); }
   pBtn.onclick = () => { if(audio.paused) playMusic(); else { audio.pause(); pIco.setAttribute('d', "M8 5v14l11-7z"); } };
-  
   document.getElementById('btnMute').onclick = () => { 
     audio.muted = !audio.muted;
     mIco.setAttribute('d', audio.muted ? "M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" : "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z");
   };
-  
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
-  /* * CORRECCIÓN 1 MEJORADA: Redondear las coordenadas del Plist */
-  const processData = (txt) => {
+  /* ***************************************************************
+   * EL NUEVO MOTOR: DESPLISTEAR Y RE-EMPAQUETAR (Split & Pack)
+   * ***************************************************************/
+
+  // 1. Procesa los textos (Plist y Fnt)
+  const processText = (txt) => {
     let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${Math.round(parseFloat(x)/2)},${Math.round(parseFloat(y)/2)}}`);
-    
     const tags = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight', 'scaleW', 'scaleH'];
     tags.forEach(t => {
       const regex = new RegExp(`\\b${t}=([-+]?\\d+)\\b`, 'g');
@@ -186,65 +184,112 @@
     return res.replace(/-uhd/gi, '-hd');
   };
 
-  /* * CORRECCIÓN 2 MEJORADA: ESCÁNER ANTI-SANGRADO PROFUNDO */
-  const resizeQuality = async (blob) => {
+  // 2. Extrae sprite por sprite usando las coordenadas del Plist original
+  async function resizeWithSplitting(pngBlob, plistText) {
     return new Promise((res) => {
-      const img = new Image(); img.src = URL.createObjectURL(blob);
+      const img = new Image(); img.src = URL.createObjectURL(pngBlob);
       img.onload = () => {
-        const cOrig = document.createElement('canvas');
-        cOrig.width = img.width; cOrig.height = img.height;
-        const ctxOrig = cOrig.getContext('2d', { willReadFrequently: true });
-        ctxOrig.drawImage(img, 0, 0);
-        
-        const imgData = ctxOrig.getImageData(0, 0, cOrig.width, cOrig.height);
-        const data = imgData.data;
-        
-        for(let i = 0; i < data.length; i += 4) {
-          if(data[i+3] < 10) { 
-            data[i] = 0;     
-            data[i+1] = 0;   
-            data[i+2] = 0;   
-            data[i+3] = 0;   
-          }
-        }
-        ctxOrig.putImageData(imgData, 0, 0);
-
+        // Lienzo en blanco, completamente limpio y transparente
         const cDest = document.createElement('canvas');
         cDest.width = Math.floor(img.width / 2); cDest.height = Math.floor(img.height / 2);
         const ctxDest = cDest.getContext('2d');
+        ctxDest.imageSmoothingEnabled = true; ctxDest.imageSmoothingQuality = 'high';
+
+        // Buscamos todas las cajas de coordenadas {{x,y},{w,h}} del Plist
+        const frameRegex = /<key>(?:frame|textureRect)<\/key>\s*<string>\{\{([-+]?\d*\.?\d+),\s*([-+]?\d*\.?\d+)\},\s*\{([-+]?\d*\.?\d+),\s*([-+]?\d*\.?\d+)\}\}<\/string>/g;
+        let match; let spritesDrawn = 0;
         
-        ctxDest.imageSmoothingEnabled = true;
-        ctxDest.imageSmoothingQuality = 'high';
-        ctxDest.drawImage(cOrig, 0, 0, cDest.width, cDest.height);
+        while ((match = frameRegex.exec(plistText)) !== null) {
+          spritesDrawn++;
+          const origX = parseFloat(match[1]), origY = parseFloat(match[2]);
+          const origW = parseFloat(match[3]), origH = parseFloat(match[4]);
+          
+          const newX = Math.round(origX / 2), newY = Math.round(origY / 2);
+          const newW = Math.round(origW / 2), newH = Math.round(origH / 2);
+
+          // Magia pura: Solo copiamos el sprite individual a su nueva posición
+          ctxDest.drawImage(img, origX, origY, origW, origH, newX, newY, newW, newH);
+        }
+
+        // Si es un archivo que no tenía coordenadas estándar, hacemos resize tradicional
+        if(spritesDrawn === 0) ctxDest.drawImage(img, 0, 0, cDest.width, cDest.height);
         
         cDest.toBlob(res, 'image/png');
       };
     });
-  };
+  }
+
+  // 3. Resize tradicional para archivos sueltos (como los fondos del juego)
+  async function normalResize(blob) {
+    return new Promise((res) => {
+      const img = new Image(); img.src = URL.createObjectURL(blob);
+      img.onload = () => {
+        const cDest = document.createElement('canvas');
+        cDest.width = Math.floor(img.width / 2); cDest.height = Math.floor(img.height / 2);
+        const ctxDest = cDest.getContext('2d');
+        ctxDest.imageSmoothingEnabled = true; ctxDest.imageSmoothingQuality = 'high';
+        ctxDest.drawImage(img, 0, 0, cDest.width, cDest.height);
+        cDest.toBlob(res, 'image/png');
+      };
+    });
+  }
 
   document.getElementById('file').onchange = async (e) => {
     const files = e.target.files; if(!files.length) return;
     const zipOut = new JSZip();
-    st.innerText = "LIMPIANDO Y PORTEANDO...";
+    st.innerText = "AGRUPANDO ARCHIVOS...";
+    sv.style.display = "none";
     
+    // Aquí agruparemos PNGs con sus respectivos Plists
+    const bundles = new Map(); 
+
+    const processEntry = async (path, blob) => {
+      if(path.includes('__MACOSX')) return;
+      
+      const lowerPath = path.toLowerCase();
+      const targetPath = path.replace(/-uhd/gi, '-hd');
+      
+      if (lowerPath.endsWith('.png') || lowerPath.endsWith('.plist')) {
+          // El 'Key' es el nombre del archivo sin extensión (ej: GJ_GameSheet-hd)
+          const baseKey = targetPath.replace(/\.(png|plist)$/i, '');
+          if(!bundles.has(baseKey)) bundles.set(baseKey, {});
+          
+          const b = bundles.get(baseKey);
+          if (lowerPath.endsWith('.png')) b.png = blob;
+          if (lowerPath.endsWith('.plist')) b.plist = await blob.text();
+          
+          b.pngPath = baseKey + '.png'; b.plistPath = baseKey + '.plist';
+      } else if (lowerPath.endsWith('.fnt')) {
+          zipOut.file(targetPath, processText(await blob.text()));
+      } else {
+          zipOut.file(targetPath, blob);
+      }
+    };
+
+    // Extraemos todo el contenido
     for (let f of files) {
       if (f.name.toLowerCase().endsWith('.zip')) {
         const zipIn = await JSZip.loadAsync(f);
         for (let path in zipIn.files) {
-          const entry = zipIn.files[path];
-          if(entry.dir || path.includes('__MACOSX')) continue;
-          let nPath = path.replace(/-uhd/gi, '-hd');
-          if (path.toLowerCase().endsWith('.png')) zipOut.file(nPath, await resizeQuality(await entry.async("blob")));
-          else if (path.match(/\.(plist|fnt)$/i)) zipOut.file(nPath, processData(await entry.async("string")));
-          else zipOut.file(nPath, await entry.async("blob"));
+          if(!zipIn.files[path].dir) await processEntry(path, await zipIn.files[path].async("blob"));
         }
       } else {
-        let n = f.name.replace(/-uhd/gi, '-hd');
-        if (f.name.toLowerCase().endsWith('.png')) zipOut.file(n, await resizeQuality(f));
-        else if (f.name.match(/\.(plist|fnt)$/i)) zipOut.file(n, processData(await f.text()));
-        else zipOut.file(n, f);
+        await processEntry(f.name, f);
       }
     }
+
+    st.innerText = "SEPARANDO Y PORTEANDO SPRITES...";
+
+    // Procesamos cada grupo (Sprite + Plist)
+    for (let [key, b] of bundles.entries()) {
+        if (b.plist) {
+            zipOut.file(b.plistPath, processText(b.plist));
+            if (b.png) zipOut.file(b.pngPath, await resizeWithSplitting(b.png, b.plist));
+        } else if (b.png) {
+            zipOut.file(b.pngPath, await normalResize(b.png));
+        }
+    }
+
     st.innerText = "¡TODO LISTO!"; sv.style.display = "block";
     
     sv.onclick = async () => {
@@ -254,15 +299,10 @@
         const a = document.createElement("a");
         a.href = URL.createObjectURL(content);
         a.download = "TexturePack_Perfect_By_Ketsu.zip";
-        
-        document.body.appendChild(a); 
-        a.click();                    
-        document.body.removeChild(a); 
-        
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); 
         st.innerText = "¡DESCARGA COMPLETADA!";
       } catch(error) {
-        st.innerText = "ERROR AL DESCARGAR";
-        console.error(error);
+        st.innerText = "ERROR AL DESCARGAR"; console.error(error);
       }
     };
   };
