@@ -30,65 +30,48 @@
     }
 
     .custom-bg {
-      position: fixed; top: -30px; left: -30px; right: -30px;
-      bottom: -30px; 
-      background-image: url('fondo.jpg'); background-size: cover;
-      background-position: center; filter: blur(10px); z-index: -2;
+      position: fixed; top: -30px; left: -30px; right: -30px; bottom: -30px; 
+      background-image: url('fondo.jpg'); background-size: cover; background-position: center; filter: blur(10px); z-index: -2;
     }
     .bg-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: var(--bg-overlay); z-index: -1; transition: background 0.5s ease;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: -1; transition: background 0.5s ease;
     }
 
     .top-controls {
-      display: flex; justify-content: space-between; align-items: center; 
-      width: 85%; max-width: 350px; margin-bottom: 20px; z-index: 10;
+      display: flex; justify-content: space-between; align-items: center; width: 85%; max-width: 350px; margin-bottom: 20px; z-index: 10;
     }
     .btn-top {
-      background: var(--glass); border: 1px solid var(--border); 
-      width: 50px; height: 50px; border-radius: 50%; cursor: pointer; 
-      backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-      display: flex; align-items: center; justify-content: center;
+      background: var(--glass); border: 1px solid var(--border); width: 50px; height: 50px; border-radius: 50%; cursor: pointer; 
+      backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); display: flex; align-items: center; justify-content: center;
       box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s ease;
     }
     .btn-top:active { transform: scale(0.92); }
     .btn-top svg { fill: var(--text); }
 
     .contenedor {
-      background: var(--glass);
-      backdrop-filter: blur(35px) saturate(180%); -webkit-backdrop-filter: blur(35px) saturate(180%);
-      border: 1px solid var(--border); border-radius: 40px;
-      padding: 30px 25px; width: 85%; max-width: 350px;
-      text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      background: var(--glass); backdrop-filter: blur(35px) saturate(180%); -webkit-backdrop-filter: blur(35px) saturate(180%);
+      border: 1px solid var(--border); border-radius: 40px; padding: 30px 25px; width: 85%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
 
     .profile-section { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
     .profile-pic {
-      width: 85px; height: 85px; border-radius: 50%; border: 3px solid var(--music-pink); object-fit: cover;
-      box-shadow: 0 4px 15px rgba(255, 45, 85, 0.3);
+      width: 85px; height: 85px; border-radius: 50%; border: 3px solid var(--music-pink); object-fit: cover; box-shadow: 0 4px 15px rgba(255, 45, 85, 0.3);
     }
     .profile-welcome { margin-top: 12px; font-weight: 800; font-size: 16px; letter-spacing: -0.5px; }
 
     h1 { font-size: 20px; font-weight: 800; letter-spacing: -1px; margin: 5px 0; }
     
     .drop-zone {
-      background: rgba(128,128,128,0.05); border: 1px dashed var(--sub-text);
-      border-radius: 30px; padding: 40px 20px; cursor: pointer; display: block; margin-top: 15px;
-      transition: transform 0.2s;
+      background: rgba(128,128,128,0.05); border: 1px dashed var(--sub-text); border-radius: 30px; padding: 40px 20px; cursor: pointer; display: block; margin-top: 15px; transition: transform 0.2s;
     }
     .drop-zone:active { transform: scale(0.98); }
     #status { font-size: 11px; color: var(--music-pink); margin-top: 20px; font-weight: 800; }
     #saveBtn {
-      background: var(--music-pink); color: #ffffff; border: none;
-      padding: 18px; border-radius: 24px; 
-      width: 100%; font-weight: 800; margin-top: 20px; display: none; cursor: pointer;
+      background: var(--music-pink); color: #ffffff; border: none; padding: 18px; border-radius: 24px; width: 100%; font-weight: 800; margin-top: 20px; display: none; cursor: pointer;
     }
 
     .mini-player {
-      margin-top: 20px; background: var(--glass); border-radius: 30px; padding: 18px 25px;
-      width: 85%; max-width: 350px; border: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(35px) saturate(180%);
-      -webkit-backdrop-filter: blur(35px) saturate(180%);
+      margin-top: 20px; background: var(--glass); border-radius: 30px; padding: 18px 25px; width: 85%; max-width: 350px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(35px) saturate(180%); -webkit-backdrop-filter: blur(35px) saturate(180%);
     }
     .btn-svg { background: none; border: none; padding: 5px; cursor: pointer; display: flex; align-items: center; }
     .btn-svg svg { fill: var(--text); width: 22px; height: 22px; }
@@ -96,9 +79,7 @@
 
     .social-bar { margin-top: 20px; display: flex; gap: 12px; width: 85%; max-width: 350px; }
     .social-btn {
-      flex: 1; background: var(--glass); border: 1px solid var(--border); padding: 14px; border-radius: 22px;
-      text-decoration: none; color: var(--text); font-size: 13px; font-weight: 700;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
+      flex: 1; background: var(--glass); border: 1px solid var(--border); padding: 14px; border-radius: 22px; text-decoration: none; color: var(--text); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;
     }
   </style>
 </head>
@@ -141,7 +122,7 @@
 </div>
 
 <script>
-  /* Interfaz y Audio (Sin Cambios) */
+  /* Interfaz y Audio */
   const body = document.getElementById('mainBody'); const audio = document.getElementById('audio');
   const st = document.getElementById('status'); const sv = document.getElementById('saveBtn');
   const mIco = document.getElementById('m-ico'); const pIco = document.getElementById('p-ico');
@@ -157,161 +138,143 @@
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
   /* ***************************************************************
-   * EL MOTOR DEFINITIVO: SPLIT, ROTATE REVERT, SCALE & PACK
-   * Este es el método profesional (GD Colon style)
+   * MOTOR GD COLON STYLE: SPLIT & BIN PACKING
+   * Lee rotaciones correctamente, corta cada icono, lo redimensiona
+   * y los vuelve a empaquetar en una hoja nueva como un Tetris.
    * ***************************************************************/
 
-  // --- Herramientas de Parseo XML (Apple Plist) ---
-  function parsePlistDict(node) {
-      let obj = {}; let currentKey = null;
-      for (let child of node.children) {
-          if (child.tagName === 'key') { currentKey = child.textContent; } 
-          else if (currentKey) {
-              if (child.tagName === 'dict') obj[currentKey] = parsePlistDict(child);
-              else if (child.tagName === 'string') obj[currentKey] = child.textContent;
-              else if (child.tagName === 'true') obj[currentKey] = true;
-              else if (child.tagName === 'false') obj[currentKey] = false;
-              else if (child.tagName === 'integer') obj[currentKey] = parseInt(child.textContent);
-              else if (child.tagName === 'real') obj[currentKey] = parseFloat(child.textContent);
-              else if (child.tagName === 'array') obj[currentKey] = [];
-              currentKey = null;
-          }
-      }
-      return obj;
+  function halveStr(str) {
+      if(!str) return str;
+      return str.replace(/([-+]?\d*\.?\d+)/g, m => Math.round(parseFloat(m)/2));
   }
 
-  function serializePlistDict(obj, indent = '\t\t') {
-      let str = "";
-      for (let k in obj) {
-          str += `${indent}<key>${k}</key>\n`;
-          let v = obj[k];
-          if (typeof v === 'object' && !Array.isArray(v)) str += `${indent}<dict>\n${serializePlistDict(v, indent + '\t')}${indent}</dict>\n`;
-          else if (Array.isArray(v)) str += `${indent}<array/>\n`;
-          else if (typeof v === 'string') str += `${indent}<string>${v}</string>\n`;
-          else if (typeof v === 'boolean') str += `${indent}<${v ? 'true' : 'false'}/>\n`;
-          else if (typeof v === 'number') str += `${indent}<${Number.isInteger(v)?'integer':'real'}>${v}</${Number.isInteger(v)?'integer':'real'}>\n`;
-      }
-      return str;
+  async function splitAndPack(pngBlob, plistText) {
+    return new Promise((res, rej) => {
+      const img = new Image(); img.src = URL.createObjectURL(pngBlob);
+      img.onload = () => {
+        try {
+            const doc = new DOMParser().parseFromString(plistText, "application/xml");
+            const rootDict = doc.documentElement.firstElementChild;
+            let framesDict = null, metadataDict = null;
+            
+            for (let i = 0; i < rootDict.children.length; i++) {
+                if (rootDict.children[i].tagName === 'key' && rootDict.children[i].textContent === 'frames') framesDict = rootDict.children[i+1];
+                if (rootDict.children[i].tagName === 'key' && rootDict.children[i].textContent === 'metadata') metadataDict = rootDict.children[i+1];
+            }
+
+            let sprites = [];
+
+            // 1. DESPLISTEAR: Extraer sprite por sprite
+            for (let i = 0; i < framesDict.children.length; i++) {
+                if (framesDict.children[i].tagName !== 'key') continue;
+                let spriteName = framesDict.children[i].textContent;
+                let spriteData = framesDict.children[i+1];
+                
+                let origX=0, origY=0, origW=0, origH=0, rotated=false;
+                let rectNode = null, offsetNode = null, sizeNode = null, srcSizeNode = null, srcColorNode = null;
+
+                for(let j=0; j < spriteData.children.length; j++) {
+                    let key = spriteData.children[j].textContent;
+                    let val = spriteData.children[j+1];
+                    if(spriteData.children[j].tagName !== 'key') continue;
+
+                    if(key === 'textureRect' || key === 'frame') {
+                        rectNode = val;
+                        let m = val.textContent.match(/([-+]?\d*\.?\d+)/g);
+                        if(m && m.length >= 4) { origX = parseFloat(m[0]); origY = parseFloat(m[1]); origW = parseFloat(m[2]); origH = parseFloat(m[3]); }
+                    }
+                    if(key === 'textureRotated' || key === 'rotated') rotated = (val.tagName === 'true');
+                    if(key === 'spriteOffset' || key === 'offset') offsetNode = val;
+                    if(key === 'spriteSize' || key === 'sourceSize') sizeNode = val;
+                    if(key === 'spriteSourceSize') srcSizeNode = val;
+                    if(key === 'sourceColorRect') srcColorNode = val;
+                }
+
+                if(origW <= 0 || origH <= 0) continue;
+
+                // El tamaño físico en el canvas depende de si está rotado
+                let physW = rotated ? origH : origW;
+                let physH = rotated ? origW : origH;
+
+                let tempC = document.createElement('canvas');
+                tempC.width = physW; tempC.height = physH;
+                let tempCtx = tempC.getContext('2d', { willReadFrequently: true });
+                tempCtx.drawImage(img, origX, origY, physW, physH, 0, 0, physW, physH);
+
+                // Anti-sangrado
+                let iData = tempCtx.getImageData(0,0,physW,physH);
+                for(let k=0; k<iData.data.length; k+=4) if(iData.data[k+3] < 10) { iData.data[k]=0; iData.data[k+1]=0; iData.data[k+2]=0; iData.data[k+3]=0; }
+                tempCtx.putImageData(iData, 0, 0);
+
+                // Reducimos el sprite extraído a la mitad
+                let newPhysW = Math.max(1, Math.round(physW / 2));
+                let newPhysH = Math.max(1, Math.round(physH / 2));
+                let resC = document.createElement('canvas');
+                resC.width = newPhysW; resC.height = newPhysH;
+                let resCtx = resC.getContext('2d');
+                resCtx.imageSmoothingEnabled = true; resCtx.imageSmoothingQuality = 'high';
+                resCtx.drawImage(tempC, 0, 0, newPhysW, newPhysH);
+
+                sprites.push({ canvas: resC, physW: newPhysW, physH: newPhysH, logicalW: Math.round(origW/2), logicalH: Math.round(origH/2),
+                               rectNode, offsetNode, sizeNode, srcSizeNode, srcColorNode });
+            }
+
+            // 2. EMPAQUETAR (Bin Packing "Shelf" Algorithm)
+            // Acomodamos del más alto al más bajito para ahorrar el mayor espacio posible
+            sprites.sort((a, b) => b.physH - a.physH);
+            let cx = 0, cy = 0, rowH = 0, maxW = 2048, actualW = 0;
+            const PADDING = 2; // Relleno entre iconos para que no choquen jamás
+
+            for (let s of sprites) {
+                if (cx + s.physW + PADDING > maxW) {
+                    cx = 0; cy += rowH + PADDING; rowH = 0;
+                }
+                s.newX = cx; s.newY = cy;
+                rowH = Math.max(rowH, s.physH);
+                cx += s.physW + PADDING;
+                actualW = Math.max(actualW, cx);
+            }
+            let totalW = Math.max(1, actualW); let totalH = cy + rowH;
+
+            // 3. DIBUJAR LA HOJA FINAL
+            let finalC = document.createElement('canvas');
+            finalC.width = totalW; finalC.height = totalH;
+            let finalCtx = finalC.getContext('2d');
+
+            for (let s of sprites) {
+                finalCtx.drawImage(s.canvas, s.newX, s.newY);
+                // Actualizamos el Plist con las nuevas posiciones y tamaños
+                if(s.rectNode) s.rectNode.textContent = `{{${s.newX},${s.newY}},{${s.logicalW},${s.logicalH}}}`;
+                if(s.offsetNode) s.offsetNode.textContent = halveStr(s.offsetNode.textContent);
+                if(s.sizeNode) s.sizeNode.textContent = halveStr(s.sizeNode.textContent);
+                if(s.srcSizeNode) s.srcSizeNode.textContent = halveStr(s.srcSizeNode.textContent);
+                if(s.srcColorNode) s.srcColorNode.textContent = halveStr(s.srcColorNode.textContent);
+            }
+
+            // 4. ACTUALIZAR METADATA Y EXPORTAR
+            if(metadataDict) {
+                for(let i=0; i<metadataDict.children.length; i++) {
+                    if(metadataDict.children[i].tagName==='key' && metadataDict.children[i].textContent==='size') {
+                        metadataDict.children[i+1].textContent = `{${totalW},${totalH}}`;
+                    }
+                    if(metadataDict.children[i].tagName==='key' && (metadataDict.children[i].textContent==='realTextureFileName' || metadataDict.children[i].textContent==='textureFileName')) {
+                        metadataDict.children[i+1].textContent = metadataDict.children[i+1].textContent.replace(/-uhd/gi, '-hd');
+                    }
+                }
+            }
+
+            const serializer = new XMLSerializer();
+            let newXmlStr = serializer.serializeToString(doc);
+            newXmlStr = newXmlStr.replace(/<\?xml.*\?>\n?/, "");
+            newXmlStr = `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n` + newXmlStr;
+
+            finalC.toBlob(blob => res({ png: blob, plist: newXmlStr }), 'image/png');
+        } catch(e) { rej(e); }
+      };
+      img.onerror = rej;
+    });
   }
 
-  function parseRect(str) { let m = str.match(/([-+]?\d*\.?\d+)/g); return m ? {x:parseFloat(m[0]), y:parseFloat(m[1]), w:parseFloat(m[2]), h:parseFloat(m[3])} : {x:0,y:0,w:0,h:0}; }
-  function halveVecStr(str) { return str ? str.replace(/([-+]?\d*\.?\d+)/g, m => Math.round(parseFloat(m)/2)) : str; }
-
-  // --- El procesador masivo de Sprites ---
-  async function splitPackAndResize(pngBlob, plistText) {
-      const doc = new DOMParser().parseFromString(plistText, "text/xml");
-      const rootDict = doc.querySelector("plist > dict");
-      if (!rootDict) throw new Error("Plist inválido");
-      
-      let pData = parsePlistDict(rootDict);
-      let frames = pData.frames || {};
-      let metadata = pData.metadata || {};
-
-      let img = new Image(); img.src = URL.createObjectURL(pngBlob);
-      await new Promise(r => img.onload = r);
-
-      let sprites = [];
-
-      // PASO 1: EXTRAER Y ENDEREZAR
-      for (let name in frames) {
-          let f = frames[name];
-          let tRectStr = f.textureRect || f.frame; // Soporta Formato 3 y Formato 2
-          if(!tRectStr) continue;
-
-          let tRect = parseRect(tRectStr);
-          let isRotated = f.textureRotated === true || f.rotated === true;
-
-          // 1. Recortar exacto
-          let extC = document.createElement('canvas');
-          extC.width = tRect.w; extC.height = tRect.h;
-          let extCtx = extC.getContext('2d');
-          extCtx.drawImage(img, tRect.x, tRect.y, tRect.w, tRect.h, 0, 0, tRect.w, tRect.h);
-
-          // 2. Enderezar (Geometry Dash rota 90° a la derecha)
-          let upW = isRotated ? tRect.h : tRect.w;
-          let upH = isRotated ? tRect.w : tRect.h;
-          let upC = document.createElement('canvas');
-          upC.width = upW; upC.height = upH;
-          let upCtx = upC.getContext('2d');
-          
-          if (isRotated) {
-              upCtx.translate(upW/2, upH/2);
-              upCtx.rotate(-Math.PI/2); // Lo giramos a la izquierda para arreglarlo
-              upCtx.drawImage(extC, -tRect.w/2, -tRect.h/2);
-          } else {
-              upCtx.drawImage(extC, 0, 0);
-          }
-
-          // Anti-Sangrado (Opcional, limpia bordes fantasma)
-          let imgData = upCtx.getImageData(0,0,upW,upH);
-          for(let i=0; i<imgData.data.length; i+=4) if(imgData.data[i+3] < 5) { imgData.data[i]=0; imgData.data[i+1]=0; imgData.data[i+2]=0; imgData.data[i+3]=0; }
-          upCtx.putImageData(imgData, 0,0);
-
-          // 3. Achicar (Resize 0.5)
-          let newW = Math.round(upW / 2); let newH = Math.round(upH / 2);
-          if(newW < 1) newW = 1; if(newH < 1) newH = 1;
-          
-          let resC = document.createElement('canvas');
-          resC.width = newW; resC.height = newH;
-          let resCtx = resC.getContext('2d');
-          resCtx.imageSmoothingEnabled = true; resCtx.imageSmoothingQuality = 'high';
-          resCtx.drawImage(upC, 0, 0, newW, newH);
-
-          // 4. Clonar propiedades originales y calcular nuevas a la mitad
-          let newF = { ...f };
-          if(newF.spriteOffset) newF.spriteOffset = halveVecStr(f.spriteOffset);
-          if(newF.offset) newF.offset = halveVecStr(f.offset);
-          if(newF.spriteSize) newF.spriteSize = halveVecStr(f.spriteSize);
-          if(newF.spriteSourceSize) newF.spriteSourceSize = halveVecStr(f.spriteSourceSize);
-          if(newF.sourceSize) newF.sourceSize = halveVecStr(f.sourceSize);
-          if(newF.sourceColorRect) newF.sourceColorRect = halveVecStr(f.sourceColorRect);
-          
-          // Ya no está rotado!
-          if(newF.textureRotated !== undefined) newF.textureRotated = false;
-          if(newF.rotated !== undefined) newF.rotated = false;
-
-          sprites.push({ name: name, canvas: resC, w: newW, h: newH, newData: newF });
-      }
-
-      // PASO 2: EMPAQUETAR (Bin Packing "Tetris")
-      sprites.sort((a, b) => b.h - a.h); // Acomodar del más alto al más bajo ahorra espacio
-      const MAX_WIDTH = 2048; const PADDING = 2; // Relleno de 2px para que no haya líneas blancas
-      
-      let cx = 0, cy = 0, rowH = 0, atlasW = 0;
-      for (let s of sprites) {
-          if (cx + s.w > MAX_WIDTH) { cx = 0; cy += rowH + PADDING; rowH = 0; }
-          s.px = cx; s.py = cy;
-          rowH = Math.max(rowH, s.h);
-          cx += s.w + PADDING;
-          atlasW = Math.max(atlasW, cx);
-      }
-      let atlasH = cy + rowH;
-
-      // PASO 3: DIBUJAR LA HOJA FINAL
-      let atlasC = document.createElement('canvas');
-      atlasC.width = atlasW; atlasC.height = atlasH;
-      let atlasCtx = atlasC.getContext('2d');
-      for (let s of sprites) {
-          atlasCtx.drawImage(s.canvas, s.px, s.py);
-          // Actualizamos sus coordenadas rectangulares finales
-          let finalRect = `{{${s.px},${s.py}},{${s.w},${s.h}}}`;
-          if(s.newData.textureRect) s.newData.textureRect = finalRect;
-          if(s.newData.frame) s.newData.frame = finalRect;
-          pData.frames[s.name] = s.newData; // Reemplazar en el Plist maestro
-      }
-
-      // PASO 4: ACTUALIZAR METADATA Y GENERAR ARCHIVOS
-      if(metadata.size) metadata.size = `{${atlasW},${atlasH}}`;
-      let texName = (metadata.realTextureFileName || metadata.textureFileName || "texture.png").replace(/-uhd/gi, '-hd');
-      if(metadata.realTextureFileName) metadata.realTextureFileName = texName;
-      if(metadata.textureFileName) metadata.textureFileName = texName;
-      
-      let finalPlistXML = `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n<dict>\n${serializePlistDict(pData, '\t')}</dict>\n</plist>`;
-
-      return new Promise(res => { atlasC.toBlob(blob => res({ png: blob, plist: finalPlistXML }), 'image/png'); });
-  }
-
-  // --- Resize Básico para archivos FNT o imágenes solitarias ---
   const processFNT = (txt) => {
     let res = txt;
     ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight', 'scaleW', 'scaleH'].forEach(t => {
@@ -325,7 +288,7 @@
       const img = new Image(); img.src = URL.createObjectURL(blob);
       img.onload = () => {
         const cDest = document.createElement('canvas');
-        cDest.width = Math.floor(img.width / 2); cDest.height = Math.floor(img.height / 2);
+        cDest.width = Math.max(1, Math.floor(img.width / 2)); cDest.height = Math.max(1, Math.floor(img.height / 2));
         const ctxDest = cDest.getContext('2d');
         ctxDest.imageSmoothingEnabled = true; ctxDest.imageSmoothingQuality = 'high';
         ctxDest.drawImage(img, 0, 0, cDest.width, cDest.height);
@@ -334,7 +297,6 @@
     });
   }
 
-  // --- LÓGICA PRINCIPAL DE BOTONES ---
   document.getElementById('file').onchange = async (e) => {
     const files = e.target.files; if(!files.length) return;
     const zipOut = new JSZip();
@@ -362,7 +324,6 @@
       }
     };
 
-    // Extraemos todo el contenido
     for (let f of files) {
       if (f.name.toLowerCase().endsWith('.zip')) {
         const zipIn = await JSZip.loadAsync(f);
@@ -370,20 +331,18 @@
       } else await processEntry(f.name, f);
     }
 
-    // Procesamos cada grupo (Sprite + Plist) con Contador
     let total = bundles.size; let current = 0;
     for (let [key, b] of bundles.entries()) {
         current++;
-        st.innerText = `SEPARANDO Y PORTEANDO: ${key} (${current}/${total})`;
+        st.innerText = `EMPAQUETANDO: ${key} (${current}/${total})`;
         
         if (b.plist && b.png) {
             try {
-                const result = await splitPackAndResize(b.png, b.plist);
+                const result = await splitAndPack(b.png, b.plist);
                 zipOut.file(b.pngPath, result.png);
                 zipOut.file(b.plistPath, result.plist);
             } catch(e) { 
-                console.error("Error en " + key, e); 
-                // Si falla por alguna rareza del Plist, hace resize normal por seguridad
+                console.error("Error aislando " + key, e); 
                 zipOut.file(b.pngPath, await normalResize(b.png));
                 zipOut.file(b.plistPath, b.plist.replace(/-uhd/gi, '-hd'));
             }
@@ -397,7 +356,7 @@
     st.innerText = "¡TODO LISTO!"; sv.style.display = "block";
     
     sv.onclick = async () => {
-      st.innerText = "EMPAQUETANDO... ESPERA"; 
+      st.innerText = "DESCARGANDO... ESPERA"; 
       try {
         const content = await zipOut.generateAsync({type:"blob"});
         const a = document.createElement("a");
