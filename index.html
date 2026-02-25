@@ -23,53 +23,45 @@
       --sub-text: rgba(255, 255, 255, 0.5);
     }
     body { 
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; 
       margin: 0; padding: 0; min-height: 100vh;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       color: var(--text); overflow: hidden;
     }
 
     .custom-bg {
-      position: fixed; top: -30px; left: -30px; right: -30px;
-      bottom: -30px; 
+      position: fixed; top: -30px; left: -30px; right: -30px; bottom: -30px; 
       background-image: url('fondo.jpg'); background-size: cover;
       background-position: center; filter: blur(10px); z-index: -2;
     }
     .bg-overlay {
-      position: fixed; top: 0; left: 0; width: 100%;
-      height: 100%;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: var(--bg-overlay); z-index: -1; transition: background 0.5s ease;
     }
 
     .top-controls {
       display: flex; justify-content: space-between; align-items: center; 
-      width: 85%;
-      max-width: 350px; margin-bottom: 20px; z-index: 10;
+      width: 85%; max-width: 350px; margin-bottom: 20px; z-index: 10;
     }
     .btn-top {
-      background: var(--glass);
-      border: 1px solid var(--border); 
+      background: var(--glass); border: 1px solid var(--border); 
       width: 50px; height: 50px; border-radius: 50%; cursor: pointer; 
       backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-      display: flex; align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s ease;
     }
     .btn-top:active { transform: scale(0.92); }
     .btn-top svg { fill: var(--text); }
 
     .contenedor {
-      background: var(--glass);
-      backdrop-filter: blur(35px) saturate(180%);
+      background: var(--glass); backdrop-filter: blur(35px) saturate(180%);
       -webkit-backdrop-filter: blur(35px) saturate(180%);
       border: 1px solid var(--border); border-radius: 40px;
-      padding: 30px 25px; width: 85%; max-width: 350px;
-      text-align: center;
+      padding: 30px 25px; width: 85%; max-width: 350px; text-align: center;
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
 
-    .profile-section { display: flex; flex-direction: column; align-items: center;
-      margin-bottom: 20px; }
+    .profile-section { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
     .profile-pic {
       width: 85px; height: 85px; border-radius: 50%;
       border: 3px solid var(--music-pink); object-fit: cover;
@@ -80,24 +72,20 @@
     h1 { font-size: 20px; font-weight: 800; letter-spacing: -1px; margin: 5px 0; }
     
     .drop-zone {
-      background: rgba(128,128,128,0.05);
-      border: 1px dashed var(--sub-text);
+      background: rgba(128,128,128,0.05); border: 1px dashed var(--sub-text);
       border-radius: 30px; padding: 40px 20px; cursor: pointer; display: block; margin-top: 15px;
       transition: transform 0.2s;
     }
     .drop-zone:active { transform: scale(0.98); }
-    #status { font-size: 11px; color: var(--music-pink); margin-top: 20px;
-      font-weight: 800; }
+    #status { font-size: 11px; color: var(--music-pink); margin-top: 20px; font-weight: 800; }
     #saveBtn {
-      background: var(--music-pink); color: #ffffff; border: none;
-      padding: 18px; border-radius: 24px; 
+      background: var(--music-pink); color: #ffffff; border: none; padding: 18px; border-radius: 24px; 
       width: 100%; font-weight: 800; margin-top: 20px; display: none; cursor: pointer;
     }
 
     .mini-player {
       margin-top: 20px; background: var(--glass); border-radius: 30px;
-      padding: 18px 25px;
-      width: 85%; max-width: 350px; border: 1px solid var(--border);
+      padding: 18px 25px; width: 85%; max-width: 350px; border: 1px solid var(--border);
       display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(35px) saturate(180%);
       -webkit-backdrop-filter: blur(35px) saturate(180%);
     }
@@ -105,14 +93,11 @@
     .btn-svg svg { fill: var(--text); width: 22px; height: 22px; }
     #btnPlay svg { width: 32px; height: 32px; }
 
-    .social-bar { margin-top: 20px;
-      display: flex; gap: 12px; width: 85%; max-width: 350px; }
+    .social-bar { margin-top: 20px; display: flex; gap: 12px; width: 85%; max-width: 350px; }
     .social-btn {
-      flex: 1;
-      background: var(--glass); border: 1px solid var(--border); padding: 14px; border-radius: 22px;
+      flex: 1; background: var(--glass); border: 1px solid var(--border); padding: 14px; border-radius: 22px;
       text-decoration: none; color: var(--text); font-size: 13px; font-weight: 700;
-      display: flex;
-      align-items: center; justify-content: center; gap: 8px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
   </style>
 </head>
@@ -125,7 +110,7 @@
   <button class="btn-top" id="btnMute">
     <svg width="20" height="20" viewBox="0 0 24 24"><path id="m-ico" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
   </button>
-  <button class="btn-top" id="themeBtn" style="font-size: 18px;">🌓</button>
+  <button class="btn-top" id="themeBtn" style="font-size: 18px;">🌗</button>
 </div>
 
 <div class="contenedor">
@@ -159,24 +144,24 @@
 </div>
 
 <script>
-  /* Interfaz y Audio (TU CÓDIGO ORIGINAL INTACTO) */
+  /* Interfaz y Audio */
   const body = document.getElementById('mainBody'); const audio = document.getElementById('audio');
-  const st = document.getElementById('status');
-  const sv = document.getElementById('saveBtn');
+  const st = document.getElementById('status'); const sv = document.getElementById('saveBtn');
   const mIco = document.getElementById('m-ico'); const pIco = document.getElementById('p-ico');
   const pBtn = document.getElementById('btnPlay');
   
   document.getElementById('themeBtn').onclick = () => body.classList.toggle('dark-mode');
   function playMusic() { audio.play().then(() => pIco.setAttribute('d', "M6 19h4V5H6v14zm8-14v14h4V5h-4z")).catch(()=>{}); }
   pBtn.onclick = () => { if(audio.paused) playMusic(); else { audio.pause(); pIco.setAttribute('d', "M8 5v14l11-7z"); } };
-  
   document.getElementById('btnMute').onclick = () => { 
     audio.muted = !audio.muted;
     mIco.setAttribute('d', audio.muted ? "M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" : "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z");
   };
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
-  /* TU MATEMÁTICA ORIGINAL (CON LOS DECIMALES PERFECTOS PARA EVITAR CORTES) */
+  /* * CORRECCIÓN 1: Matemáticas de Coordenadas
+   * Usamos parseFloat para mantener los decimales exactos en el .plist y no saltarnos píxeles.
+   */
   const processData = (txt) => {
     let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${parseFloat(x)/2},${parseFloat(y)/2}}`);
     const tags = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight', 'scaleW', 'scaleH'];
@@ -187,152 +172,119 @@
     return res.replace(/-uhd/gi, '-hd');
   };
 
-  /* EL MÉTODO GD COLÓN (ROTACIONES CORREGIDAS PARA NO DEFORMAR EL PLAY) */
-  const resizeQuality = async (blob, plistText = null) => {
-    return new Promise((resolve) => {
-      const img = new Image();
+  /* * NUEVA FUNCIÓN: Extraer coordenadas del Plist */
+  const getRectsFromPlist = (plistText) => {
+    const rects = [];
+    const regex = /<key>(?:textureRect|frame)<\/key>\s*<string>\{\{([-+]?\d*\.?\d+),\s*([-+]?\d*\.?\d+)\},\s*\{([-+]?\d*\.?\d+),\s*([-+]?\d*\.?\d+)\}\}<\/string>/g;
+    let match;
+    while ((match = regex.exec(plistText)) !== null) {
+      rects.push({
+        x: parseFloat(match[1]), y: parseFloat(match[2]),
+        w: parseFloat(match[3]), h: parseFloat(match[4])
+      });
+    }
+    return rects;
+  };
+
+  /* * CORRECCIÓN 2: MÉTODO GD COLON (Desplisteo en Canvas)
+   * Recorta y encoje sprite por sprite usando el plist, evitando las líneas blancas.
+   */
+  const resizeQuality = async (blob, plistText) => {
+    return new Promise((res) => {
+      const img = new Image(); img.src = URL.createObjectURL(blob);
       img.onload = () => {
-        try {
-          const cDest = document.createElement('canvas');
-          cDest.width = Math.ceil(img.width / 2);
-          cDest.height = Math.ceil(img.height / 2);
-          const ctxDest = cDest.getContext('2d');
-          ctxDest.imageSmoothingEnabled = true;
-          ctxDest.imageSmoothingQuality = 'high';
+        const cOrig = document.createElement('canvas');
+        cOrig.width = img.width; cOrig.height = img.height;
+        const ctxOrig = cOrig.getContext('2d', { willReadFrequently: true });
+        ctxOrig.drawImage(img, 0, 0);
 
-          if (plistText) {
-            // Buscamos cada sprite en el plist
-            const spriteRegex = /<key>([^<]+)<\/key>\s*<dict>([\s\S]*?)<\/dict>/g;
-            let match;
-            let foundSprites = false;
+        const w = Math.floor(img.width / 2);
+        const h = Math.floor(img.height / 2);
+        const cDest = document.createElement('canvas');
+        cDest.width = w; cDest.height = h;
+        const ctxDest = cDest.getContext('2d');
+        
+        ctxDest.clearRect(0, 0, w, h);
+        ctxDest.imageSmoothingEnabled = true;
+        ctxDest.imageSmoothingQuality = 'high';
 
-            while ((match = spriteRegex.exec(plistText)) !== null) {
-              const name = match[1];
-              if (name === "metadata") continue;
-              const dict = match[2];
-              
-              // Extraer las coordenadas (permitiendo los decimales)
-              const rectMatch = dict.match(/<key>(?:textureRect|frame)<\/key>\s*<string>\{\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}\s*,\s*\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}\}<\/string>/);
-              if (!rectMatch) continue;
-              
-              foundSprites = true;
-              const x = parseFloat(rectMatch[1]);
-              const y = parseFloat(rectMatch[2]);
-              const w = parseFloat(rectMatch[3]);
-              const h = parseFloat(rectMatch[4]);
-              if (w === 0 || h === 0) continue;
-
-              // LA SOLUCIÓN MÁGICA: Verificar si el botón está rotado en el sprite
-              const rotatedMatch = dict.match(/<key>(?:textureRotated|rotated)<\/key>\s*<(true|false)\/>/);
-              const isRotated = rotatedMatch ? rotatedMatch[1] === 'true' : false;
-
-              // Si está rotado, la imagen en el PNG original tiene las medidas invertidas
-              const physW = isRotated ? h : w;
-              const physH = isRotated ? w : h;
-
-              // 1. Extraer el sprite a un canvas transparente EXACTO
-              const tmp = document.createElement('canvas');
-              tmp.width = physW;
-              tmp.height = physH;
-              const tCtx = tmp.getContext('2d');
-              tCtx.drawImage(img, x, y, physW, physH, 0, 0, physW, physH);
-
-              // 2. Limpiar píxeles fantasmas (Quita las líneas blancas del GD Colon)
-              const imgData = tCtx.getImageData(0, 0, physW, physH);
-              const data = imgData.data;
-              for (let i = 0; i < data.length; i += 4) {
-                if (data[i + 3] === 0) { data[i] = 0; data[i + 1] = 0; data[i + 2] = 0; }
-              }
-              tCtx.putImageData(imgData, 0, 0);
-
-              // 3. Pegarlo en la posición reducida a la mitad (RESPETANDO LOS DECIMALES COMO EN TU PLIST)
-              ctxDest.drawImage(tmp, 0, 0, physW, physH, x / 2, y / 2, physW / 2, physH / 2);
+        if (plistText) {
+          // Si tiene plist, pegamos sprite por sprite
+          const rects = getRectsFromPlist(plistText);
+          rects.forEach(r => {
+            if (r.w > 0 && r.h > 0) {
+              ctxDest.drawImage(cOrig, r.x, r.y, r.w, r.h, r.x/2, r.y/2, r.w/2, r.h/2);
             }
-
-            if (!foundSprites) {
-              ctxDest.drawImage(img, 0, 0, img.width, img.height, 0, 0, cDest.width, cDest.height);
-            }
-          } else {
-            // TU LÓGICA ANTI-LÍNEAS BLANCAS PARA FONDOS SIN PLIST
-            const cOrig = document.createElement('canvas');
-            cOrig.width = img.width; cOrig.height = img.height;
-            const ctxOrig = cOrig.getContext('2d', { willReadFrequently: true });
-            ctxOrig.drawImage(img, 0, 0);
-            
-            const imgData = ctxOrig.getImageData(0, 0, cOrig.width, cOrig.height);
-            const data = imgData.data;
-            for (let i = 0; i < data.length; i += 4) {
-              if (data[i + 3] === 0) { data[i] = 0; data[i + 1] = 0; data[i + 2] = 0; }
-            }
-            ctxOrig.putImageData(imgData, 0, 0);
-            ctxDest.drawImage(cOrig, 0, 0, cDest.width, cDest.height);
-          }
-          
-          cDest.toBlob(resolve, 'image/png');
-        } catch (error) {
-          // Si algo falla, devuelve la imagen normal para no trabar el botón de descarga
-          const fallback = document.createElement('canvas');
-          fallback.width = Math.ceil(img.width/2); fallback.height = Math.ceil(img.height/2);
-          fallback.getContext('2d').drawImage(img, 0, 0, fallback.width, fallback.height);
-          fallback.toBlob(resolve, 'image/png');
+          });
+        } else {
+          // Si no tiene plist (fondos sueltos), se hace normal
+          ctxDest.drawImage(cOrig, 0, 0, w, h);
         }
+        
+        cDest.toBlob(res, 'image/png');
       };
-      img.onerror = () => resolve(blob);
-      img.src = URL.createObjectURL(blob);
     });
   };
 
-  /* PROCESAMIENTO DEL ZIP (CON TU BOTON DE DESCARGA ASEGURADO) */
   document.getElementById('file').onchange = async (e) => {
     const files = e.target.files; if(!files.length) return;
-    const zipOut = new JSZip();
-    st.innerText = "LIMPIANDO Y PORTEANDO...";
+    const zipOut = new JSZip(); st.innerText = "LIMPIANDO Y PORTEANDO...";
     
-    try {
-      for (let f of files) {
-        if (f.name.toLowerCase().endsWith('.zip')) {
-          const zipIn = await JSZip.loadAsync(f);
-          for (let path in zipIn.files) {
-            const entry = zipIn.files[path];
-            if(entry.dir || path.includes('__MACOSX')) continue;
-            let nPath = path.replace(/-uhd/gi, '-hd');
-            
-            if (path.toLowerCase().endsWith('.png')) {
-              let plistPath = path.replace(/\.png$/i, '.plist');
-              let pText = zipIn.files[plistPath] ? await zipIn.files[plistPath].async("string") : null;
-              zipOut.file(nPath, await resizeQuality(await entry.async("blob"), pText));
-            }
-            else if (path.match(/\.(plist|fnt)$/i)) zipOut.file(nPath, processData(await entry.async("string")));
-            else zipOut.file(nPath, await entry.async("blob"));
-          }
-        } else {
-          let n = f.name.replace(/-uhd/gi, '-hd');
-          if (f.name.toLowerCase().endsWith('.png')) {
-            let plistName = f.name.replace(/\.png$/i, '.plist');
-            let plistFile = Array.from(files).find(x => x.name === plistName);
-            let pText = plistFile ? await plistFile.text() : null;
-            zipOut.file(n, await resizeQuality(f, pText));
-          }
-          else if (f.name.match(/\.(plist|fnt)$/i)) zipOut.file(n, processData(await f.text()));
-          else zipOut.file(n, f);
+    const plistDataMap = {}; // Memoria para los .plist
+
+    if (files[0].name.toLowerCase().endsWith('.zip')) {
+      const zipIn = await JSZip.loadAsync(files[0]);
+      
+      // Primera pasada: Guardar los .plist
+      for (let path in zipIn.files) {
+        const entry = zipIn.files[path]; if(entry.dir || path.includes('__MACOSX')) continue;
+        if (path.match(/\.plist$/i)) {
+          plistDataMap[path] = await entry.async("string");
         }
       }
       
-      // EL BOTÓN DE DESCARGA APARECE SIEMPRE
-      st.innerText = "¡TODO LISTO!"; 
-      sv.style.display = "block";
-      
-      sv.onclick = async () => {
-        const content = await zipOut.generateAsync({type:"blob"});
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(content);
-        a.download = "TexturePack_Perfect_By_Ketsu.zip"; 
-        a.click();
-      };
-    } catch (err) {
-      console.error(err);
-      st.innerText = "¡Hubo un error! Revisa la consola.";
+      // Segunda pasada: Procesar todo conectando imágenes con su .plist
+      for (let path in zipIn.files) {
+        const entry = zipIn.files[path]; if(entry.dir || path.includes('__MACOSX')) continue;
+        let nPath = path.replace(/-uhd/gi, '-hd');
+        
+        if (path.toLowerCase().endsWith('.png')) {
+          const plistPath = path.replace(/\.png$/i, '.plist');
+          const pText = plistDataMap[plistPath] || null;
+          zipOut.file(nPath, await resizeQuality(await entry.async("blob"), pText));
+        } else if (path.match(/\.(plist|fnt)$/i)) {
+          const text = path.match(/\.plist$/i) ? plistDataMap[path] : await entry.async("string");
+          zipOut.file(nPath, processData(text));
+        } else {
+          zipOut.file(nPath, await entry.async("blob"));
+        }
+      }
+    } else {
+      // Si suben múltiples archivos sueltos
+      for (let f of files) {
+        if (f.name.match(/\.plist$/i)) plistDataMap[f.name] = await f.text();
+      }
+      for (let f of files) {
+        let n = f.name.replace(/-uhd/gi, '-hd');
+        if (f.name.toLowerCase().endsWith('.png')) {
+          const plistName = f.name.replace(/\.png$/i, '.plist');
+          const pText = plistDataMap[plistName] || null;
+          zipOut.file(n, await resizeQuality(f, pText));
+        } else if (f.name.match(/\.(plist|fnt)$/i)) {
+          const text = f.name.match(/\.plist$/i) ? plistDataMap[f.name] : await f.text();
+          zipOut.file(n, processData(text));
+        } else {
+          zipOut.file(n, f);
+        }
+      }
     }
+    
+    st.innerText = "¡TODO LISTO!"; sv.style.display = "block";
+    sv.onclick = async () => {
+      const content = await zipOut.generateAsync({type:"blob"});
+      const a = document.createElement("a"); a.href = URL.createObjectURL(content);
+      a.download = "TexturePack_Perfect_By_Ketsu.zip"; a.click();
+    };
   };
 </script>
 </body>
