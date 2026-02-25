@@ -36,23 +36,19 @@
       background-position: center; filter: blur(10px); z-index: -2;
     }
     .bg-overlay {
-      position: fixed; top: 0; left: 0; width: 100%;
-      height: 100%;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: var(--bg-overlay); z-index: -1; transition: background 0.5s ease;
     }
 
     .top-controls {
       display: flex; justify-content: space-between; align-items: center; 
-      width: 85%;
-      max-width: 350px; margin-bottom: 20px; z-index: 10;
+      width: 85%; max-width: 350px; margin-bottom: 20px; z-index: 10;
     }
     .btn-top {
-      background: var(--glass);
-      border: 1px solid var(--border); 
+      background: var(--glass); border: 1px solid var(--border); 
       width: 50px; height: 50px; border-radius: 50%; cursor: pointer; 
       backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-      display: flex; align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s ease;
     }
     .btn-top:active { transform: scale(0.92); }
@@ -60,18 +56,15 @@
 
     .contenedor {
       background: var(--glass);
-      backdrop-filter: blur(35px) saturate(180%);
-      -webkit-backdrop-filter: blur(35px) saturate(180%);
+      backdrop-filter: blur(35px) saturate(180%); -webkit-backdrop-filter: blur(35px) saturate(180%);
       border: 1px solid var(--border); border-radius: 40px;
       padding: 30px 25px; width: 85%; max-width: 350px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
 
     .profile-section { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
     .profile-pic {
-      width: 85px; height: 85px; border-radius: 50%;
-      border: 3px solid var(--music-pink); object-fit: cover;
+      width: 85px; height: 85px; border-radius: 50%; border: 3px solid var(--music-pink); object-fit: cover;
       box-shadow: 0 4px 15px rgba(255, 45, 85, 0.3);
     }
     .profile-welcome { margin-top: 12px; font-weight: 800; font-size: 16px; letter-spacing: -0.5px; }
@@ -79,8 +72,7 @@
     h1 { font-size: 20px; font-weight: 800; letter-spacing: -1px; margin: 5px 0; }
     
     .drop-zone {
-      background: rgba(128,128,128,0.05);
-      border: 1px dashed var(--sub-text);
+      background: rgba(128,128,128,0.05); border: 1px dashed var(--sub-text);
       border-radius: 30px; padding: 40px 20px; cursor: pointer; display: block; margin-top: 15px;
       transition: transform 0.2s;
     }
@@ -93,8 +85,7 @@
     }
 
     .mini-player {
-      margin-top: 20px; background: var(--glass); border-radius: 30px;
-      padding: 18px 25px;
+      margin-top: 20px; background: var(--glass); border-radius: 30px; padding: 18px 25px;
       width: 85%; max-width: 350px; border: 1px solid var(--border);
       display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(35px) saturate(180%);
       -webkit-backdrop-filter: blur(35px) saturate(180%);
@@ -105,8 +96,7 @@
 
     .social-bar { margin-top: 20px; display: flex; gap: 12px; width: 85%; max-width: 350px; }
     .social-btn {
-      flex: 1;
-      background: var(--glass); border: 1px solid var(--border); padding: 14px; border-radius: 22px;
+      flex: 1; background: var(--glass); border: 1px solid var(--border); padding: 14px; border-radius: 22px;
       text-decoration: none; color: var(--text); font-size: 13px; font-weight: 700;
       display: flex; align-items: center; justify-content: center; gap: 8px;
     }
@@ -118,9 +108,7 @@
 <div class="bg-overlay"></div>
 
 <div class="top-controls">
-  <button class="btn-top" id="btnMute">
-    <svg width="20" height="20" viewBox="0 0 24 24"><path id="m-ico" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-  </button>
+  <button class="btn-top" id="btnMute"><svg width="20" height="20" viewBox="0 0 24 24"><path id="m-ico" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button>
   <button class="btn-top" id="themeBtn" style="font-size: 18px;">🌓</button>
 </div>
 
@@ -131,9 +119,7 @@
   </div>
 
   <h1>Texture Porter GD!</h1>
-  <label for="file" class="drop-zone">
-    <span style="font-weight: 600;">Importar Pack o ZIP</span>
-  </label>
+  <label for="file" class="drop-zone"><span style="font-weight: 600;">Importar Pack o ZIP</span></label>
   <input type="file" id="file" style="display:none;" multiple>
   <div id="status">READY</div>
   <button id="saveBtn">DESCARGAR PACK PERFECTO</button>
@@ -155,6 +141,7 @@
 </div>
 
 <script>
+  /* Interfaz y Audio (Sin Cambios) */
   const body = document.getElementById('mainBody'); const audio = document.getElementById('audio');
   const st = document.getElementById('status'); const sv = document.getElementById('saveBtn');
   const mIco = document.getElementById('m-ico'); const pIco = document.getElementById('p-ico');
@@ -170,56 +157,169 @@
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
   /* ***************************************************************
-   * EL NUEVO MOTOR: DESPLISTEAR Y RE-EMPAQUETAR (Split & Pack)
+   * EL MOTOR DEFINITIVO: SPLIT, ROTATE REVERT, SCALE & PACK
+   * Este es el método profesional (GD Colon style)
    * ***************************************************************/
 
-  // 1. Procesa los textos (Plist y Fnt)
-  const processText = (txt) => {
-    let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${Math.round(parseFloat(x)/2)},${Math.round(parseFloat(y)/2)}}`);
-    const tags = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight', 'scaleW', 'scaleH'];
-    tags.forEach(t => {
-      const regex = new RegExp(`\\b${t}=([-+]?\\d+)\\b`, 'g');
-      res = res.replace(regex, (m, v) => `${t}=${Math.round(parseInt(v)/2)}`);
+  // --- Herramientas de Parseo XML (Apple Plist) ---
+  function parsePlistDict(node) {
+      let obj = {}; let currentKey = null;
+      for (let child of node.children) {
+          if (child.tagName === 'key') { currentKey = child.textContent; } 
+          else if (currentKey) {
+              if (child.tagName === 'dict') obj[currentKey] = parsePlistDict(child);
+              else if (child.tagName === 'string') obj[currentKey] = child.textContent;
+              else if (child.tagName === 'true') obj[currentKey] = true;
+              else if (child.tagName === 'false') obj[currentKey] = false;
+              else if (child.tagName === 'integer') obj[currentKey] = parseInt(child.textContent);
+              else if (child.tagName === 'real') obj[currentKey] = parseFloat(child.textContent);
+              else if (child.tagName === 'array') obj[currentKey] = [];
+              currentKey = null;
+          }
+      }
+      return obj;
+  }
+
+  function serializePlistDict(obj, indent = '\t\t') {
+      let str = "";
+      for (let k in obj) {
+          str += `${indent}<key>${k}</key>\n`;
+          let v = obj[k];
+          if (typeof v === 'object' && !Array.isArray(v)) str += `${indent}<dict>\n${serializePlistDict(v, indent + '\t')}${indent}</dict>\n`;
+          else if (Array.isArray(v)) str += `${indent}<array/>\n`;
+          else if (typeof v === 'string') str += `${indent}<string>${v}</string>\n`;
+          else if (typeof v === 'boolean') str += `${indent}<${v ? 'true' : 'false'}/>\n`;
+          else if (typeof v === 'number') str += `${indent}<${Number.isInteger(v)?'integer':'real'}>${v}</${Number.isInteger(v)?'integer':'real'}>\n`;
+      }
+      return str;
+  }
+
+  function parseRect(str) { let m = str.match(/([-+]?\d*\.?\d+)/g); return m ? {x:parseFloat(m[0]), y:parseFloat(m[1]), w:parseFloat(m[2]), h:parseFloat(m[3])} : {x:0,y:0,w:0,h:0}; }
+  function halveVecStr(str) { return str ? str.replace(/([-+]?\d*\.?\d+)/g, m => Math.round(parseFloat(m)/2)) : str; }
+
+  // --- El procesador masivo de Sprites ---
+  async function splitPackAndResize(pngBlob, plistText) {
+      const doc = new DOMParser().parseFromString(plistText, "text/xml");
+      const rootDict = doc.querySelector("plist > dict");
+      if (!rootDict) throw new Error("Plist inválido");
+      
+      let pData = parsePlistDict(rootDict);
+      let frames = pData.frames || {};
+      let metadata = pData.metadata || {};
+
+      let img = new Image(); img.src = URL.createObjectURL(pngBlob);
+      await new Promise(r => img.onload = r);
+
+      let sprites = [];
+
+      // PASO 1: EXTRAER Y ENDEREZAR
+      for (let name in frames) {
+          let f = frames[name];
+          let tRectStr = f.textureRect || f.frame; // Soporta Formato 3 y Formato 2
+          if(!tRectStr) continue;
+
+          let tRect = parseRect(tRectStr);
+          let isRotated = f.textureRotated === true || f.rotated === true;
+
+          // 1. Recortar exacto
+          let extC = document.createElement('canvas');
+          extC.width = tRect.w; extC.height = tRect.h;
+          let extCtx = extC.getContext('2d');
+          extCtx.drawImage(img, tRect.x, tRect.y, tRect.w, tRect.h, 0, 0, tRect.w, tRect.h);
+
+          // 2. Enderezar (Geometry Dash rota 90° a la derecha)
+          let upW = isRotated ? tRect.h : tRect.w;
+          let upH = isRotated ? tRect.w : tRect.h;
+          let upC = document.createElement('canvas');
+          upC.width = upW; upC.height = upH;
+          let upCtx = upC.getContext('2d');
+          
+          if (isRotated) {
+              upCtx.translate(upW/2, upH/2);
+              upCtx.rotate(-Math.PI/2); // Lo giramos a la izquierda para arreglarlo
+              upCtx.drawImage(extC, -tRect.w/2, -tRect.h/2);
+          } else {
+              upCtx.drawImage(extC, 0, 0);
+          }
+
+          // Anti-Sangrado (Opcional, limpia bordes fantasma)
+          let imgData = upCtx.getImageData(0,0,upW,upH);
+          for(let i=0; i<imgData.data.length; i+=4) if(imgData.data[i+3] < 5) { imgData.data[i]=0; imgData.data[i+1]=0; imgData.data[i+2]=0; imgData.data[i+3]=0; }
+          upCtx.putImageData(imgData, 0,0);
+
+          // 3. Achicar (Resize 0.5)
+          let newW = Math.round(upW / 2); let newH = Math.round(upH / 2);
+          if(newW < 1) newW = 1; if(newH < 1) newH = 1;
+          
+          let resC = document.createElement('canvas');
+          resC.width = newW; resC.height = newH;
+          let resCtx = resC.getContext('2d');
+          resCtx.imageSmoothingEnabled = true; resCtx.imageSmoothingQuality = 'high';
+          resCtx.drawImage(upC, 0, 0, newW, newH);
+
+          // 4. Clonar propiedades originales y calcular nuevas a la mitad
+          let newF = { ...f };
+          if(newF.spriteOffset) newF.spriteOffset = halveVecStr(f.spriteOffset);
+          if(newF.offset) newF.offset = halveVecStr(f.offset);
+          if(newF.spriteSize) newF.spriteSize = halveVecStr(f.spriteSize);
+          if(newF.spriteSourceSize) newF.spriteSourceSize = halveVecStr(f.spriteSourceSize);
+          if(newF.sourceSize) newF.sourceSize = halveVecStr(f.sourceSize);
+          if(newF.sourceColorRect) newF.sourceColorRect = halveVecStr(f.sourceColorRect);
+          
+          // Ya no está rotado!
+          if(newF.textureRotated !== undefined) newF.textureRotated = false;
+          if(newF.rotated !== undefined) newF.rotated = false;
+
+          sprites.push({ name: name, canvas: resC, w: newW, h: newH, newData: newF });
+      }
+
+      // PASO 2: EMPAQUETAR (Bin Packing "Tetris")
+      sprites.sort((a, b) => b.h - a.h); // Acomodar del más alto al más bajo ahorra espacio
+      const MAX_WIDTH = 2048; const PADDING = 2; // Relleno de 2px para que no haya líneas blancas
+      
+      let cx = 0, cy = 0, rowH = 0, atlasW = 0;
+      for (let s of sprites) {
+          if (cx + s.w > MAX_WIDTH) { cx = 0; cy += rowH + PADDING; rowH = 0; }
+          s.px = cx; s.py = cy;
+          rowH = Math.max(rowH, s.h);
+          cx += s.w + PADDING;
+          atlasW = Math.max(atlasW, cx);
+      }
+      let atlasH = cy + rowH;
+
+      // PASO 3: DIBUJAR LA HOJA FINAL
+      let atlasC = document.createElement('canvas');
+      atlasC.width = atlasW; atlasC.height = atlasH;
+      let atlasCtx = atlasC.getContext('2d');
+      for (let s of sprites) {
+          atlasCtx.drawImage(s.canvas, s.px, s.py);
+          // Actualizamos sus coordenadas rectangulares finales
+          let finalRect = `{{${s.px},${s.py}},{${s.w},${s.h}}}`;
+          if(s.newData.textureRect) s.newData.textureRect = finalRect;
+          if(s.newData.frame) s.newData.frame = finalRect;
+          pData.frames[s.name] = s.newData; // Reemplazar en el Plist maestro
+      }
+
+      // PASO 4: ACTUALIZAR METADATA Y GENERAR ARCHIVOS
+      if(metadata.size) metadata.size = `{${atlasW},${atlasH}}`;
+      let texName = (metadata.realTextureFileName || metadata.textureFileName || "texture.png").replace(/-uhd/gi, '-hd');
+      if(metadata.realTextureFileName) metadata.realTextureFileName = texName;
+      if(metadata.textureFileName) metadata.textureFileName = texName;
+      
+      let finalPlistXML = `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n<dict>\n${serializePlistDict(pData, '\t')}</dict>\n</plist>`;
+
+      return new Promise(res => { atlasC.toBlob(blob => res({ png: blob, plist: finalPlistXML }), 'image/png'); });
+  }
+
+  // --- Resize Básico para archivos FNT o imágenes solitarias ---
+  const processFNT = (txt) => {
+    let res = txt;
+    ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight', 'scaleW', 'scaleH'].forEach(t => {
+      res = res.replace(new RegExp(`\\b${t}=([-+]?\\d+)\\b`, 'g'), (m, v) => `${t}=${Math.round(parseInt(v)/2)}`);
     });
     return res.replace(/-uhd/gi, '-hd');
   };
 
-  // 2. Extrae sprite por sprite usando las coordenadas del Plist original
-  async function resizeWithSplitting(pngBlob, plistText) {
-    return new Promise((res) => {
-      const img = new Image(); img.src = URL.createObjectURL(pngBlob);
-      img.onload = () => {
-        // Lienzo en blanco, completamente limpio y transparente
-        const cDest = document.createElement('canvas');
-        cDest.width = Math.floor(img.width / 2); cDest.height = Math.floor(img.height / 2);
-        const ctxDest = cDest.getContext('2d');
-        ctxDest.imageSmoothingEnabled = true; ctxDest.imageSmoothingQuality = 'high';
-
-        // Buscamos todas las cajas de coordenadas {{x,y},{w,h}} del Plist
-        const frameRegex = /<key>(?:frame|textureRect)<\/key>\s*<string>\{\{([-+]?\d*\.?\d+),\s*([-+]?\d*\.?\d+)\},\s*\{([-+]?\d*\.?\d+),\s*([-+]?\d*\.?\d+)\}\}<\/string>/g;
-        let match; let spritesDrawn = 0;
-        
-        while ((match = frameRegex.exec(plistText)) !== null) {
-          spritesDrawn++;
-          const origX = parseFloat(match[1]), origY = parseFloat(match[2]);
-          const origW = parseFloat(match[3]), origH = parseFloat(match[4]);
-          
-          const newX = Math.round(origX / 2), newY = Math.round(origY / 2);
-          const newW = Math.round(origW / 2), newH = Math.round(origH / 2);
-
-          // Magia pura: Solo copiamos el sprite individual a su nueva posición
-          ctxDest.drawImage(img, origX, origY, origW, origH, newX, newY, newW, newH);
-        }
-
-        // Si es un archivo que no tenía coordenadas estándar, hacemos resize tradicional
-        if(spritesDrawn === 0) ctxDest.drawImage(img, 0, 0, cDest.width, cDest.height);
-        
-        cDest.toBlob(res, 'image/png');
-      };
-    });
-  }
-
-  // 3. Resize tradicional para archivos sueltos (como los fondos del juego)
   async function normalResize(blob) {
     return new Promise((res) => {
       const img = new Image(); img.src = URL.createObjectURL(blob);
@@ -234,33 +334,29 @@
     });
   }
 
+  // --- LÓGICA PRINCIPAL DE BOTONES ---
   document.getElementById('file').onchange = async (e) => {
     const files = e.target.files; if(!files.length) return;
     const zipOut = new JSZip();
     st.innerText = "AGRUPANDO ARCHIVOS...";
     sv.style.display = "none";
     
-    // Aquí agruparemos PNGs con sus respectivos Plists
     const bundles = new Map(); 
 
     const processEntry = async (path, blob) => {
-      if(path.includes('__MACOSX')) return;
-      
+      if(path.includes('__MACOSX') || path.includes('.DS_Store')) return;
       const lowerPath = path.toLowerCase();
       const targetPath = path.replace(/-uhd/gi, '-hd');
       
       if (lowerPath.endsWith('.png') || lowerPath.endsWith('.plist')) {
-          // El 'Key' es el nombre del archivo sin extensión (ej: GJ_GameSheet-hd)
           const baseKey = targetPath.replace(/\.(png|plist)$/i, '');
           if(!bundles.has(baseKey)) bundles.set(baseKey, {});
-          
           const b = bundles.get(baseKey);
           if (lowerPath.endsWith('.png')) b.png = blob;
           if (lowerPath.endsWith('.plist')) b.plist = await blob.text();
-          
           b.pngPath = baseKey + '.png'; b.plistPath = baseKey + '.plist';
       } else if (lowerPath.endsWith('.fnt')) {
-          zipOut.file(targetPath, processText(await blob.text()));
+          zipOut.file(targetPath, processFNT(await blob.text()));
       } else {
           zipOut.file(targetPath, blob);
       }
@@ -270,23 +366,31 @@
     for (let f of files) {
       if (f.name.toLowerCase().endsWith('.zip')) {
         const zipIn = await JSZip.loadAsync(f);
-        for (let path in zipIn.files) {
-          if(!zipIn.files[path].dir) await processEntry(path, await zipIn.files[path].async("blob"));
-        }
-      } else {
-        await processEntry(f.name, f);
-      }
+        for (let path in zipIn.files) if(!zipIn.files[path].dir) await processEntry(path, await zipIn.files[path].async("blob"));
+      } else await processEntry(f.name, f);
     }
 
-    st.innerText = "SEPARANDO Y PORTEANDO SPRITES...";
-
-    // Procesamos cada grupo (Sprite + Plist)
+    // Procesamos cada grupo (Sprite + Plist) con Contador
+    let total = bundles.size; let current = 0;
     for (let [key, b] of bundles.entries()) {
-        if (b.plist) {
-            zipOut.file(b.plistPath, processText(b.plist));
-            if (b.png) zipOut.file(b.pngPath, await resizeWithSplitting(b.png, b.plist));
+        current++;
+        st.innerText = `SEPARANDO Y PORTEANDO: ${key} (${current}/${total})`;
+        
+        if (b.plist && b.png) {
+            try {
+                const result = await splitPackAndResize(b.png, b.plist);
+                zipOut.file(b.pngPath, result.png);
+                zipOut.file(b.plistPath, result.plist);
+            } catch(e) { 
+                console.error("Error en " + key, e); 
+                // Si falla por alguna rareza del Plist, hace resize normal por seguridad
+                zipOut.file(b.pngPath, await normalResize(b.png));
+                zipOut.file(b.plistPath, b.plist.replace(/-uhd/gi, '-hd'));
+            }
         } else if (b.png) {
             zipOut.file(b.pngPath, await normalResize(b.png));
+        } else if (b.plist) {
+            zipOut.file(b.plistPath, b.plist.replace(/-uhd/gi, '-hd'));
         }
     }
 
@@ -301,9 +405,7 @@
         a.download = "TexturePack_Perfect_By_Ketsu.zip";
         document.body.appendChild(a); a.click(); document.body.removeChild(a); 
         st.innerText = "¡DESCARGA COMPLETADA!";
-      } catch(error) {
-        st.innerText = "ERROR AL DESCARGAR"; console.error(error);
-      }
+      } catch(error) { st.innerText = "ERROR AL DESCARGAR"; console.error(error); }
     };
   };
 </script>
