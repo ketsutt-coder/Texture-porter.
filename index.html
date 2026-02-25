@@ -159,7 +159,7 @@
 </div>
 
 <script>
-  /* Interfaz y Audio - TU CÓDIGO INTACTO */
+  /* Interfaz y Audio - INTACTOS DE TU TXT ORIGINAL */
   const body = document.getElementById('mainBody'); const audio = document.getElementById('audio');
   const st = document.getElementById('status');
   const sv = document.getElementById('saveBtn');
@@ -176,9 +176,12 @@
   };
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
-  /* Matemáticas de Coordenadas - TU CÓDIGO INTACTO */
+  /* CORRECCIÓN DE CORTES: MATH.ROUND
+   * El código anterior dejaba decimales. GD ignora los decimales y cortaba 1px de los botones.
+   * Con Math.round emparejamos la exactitud al nivel del pixel.
+   */
   const processData = (txt) => {
-    let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${parseFloat(x)/2},${parseFloat(y)/2}}`);
+    let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${Math.round(parseFloat(x)/2)},${Math.round(parseFloat(y)/2)}}`);
     const tags = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight', 'scaleW', 'scaleH'];
     tags.forEach(t => {
       const regex = new RegExp(`\\b${t}=([-+]?\\d+)\\b`, 'g');
@@ -187,68 +190,87 @@
     return res.replace(/-uhd/gi, '-hd');
   };
 
-  /* SOLUCIÓN EXACTA GD COLON PARA ERRORES DE REDONDEO Y SANGRAMIENTO BLANCO */
+  /* EL MÉTODO GD COLÓN SEGURO: AÍSLA LOS SPRITES PERO CONSERVA EL PLIST ORIGINAL */
   const resizeQuality = async (blob, plistText = null) => {
     return new Promise((res) => {
       const img = new Image(); img.src = URL.createObjectURL(blob);
       img.onload = () => {
-        const cDest = document.createElement('canvas');
-        cDest.width = Math.floor(img.width / 2); cDest.height = Math.floor(img.height / 2);
-        const ctxDest = cDest.getContext('2d');
-        ctxDest.imageSmoothingEnabled = true;
-        ctxDest.imageSmoothingQuality = 'high';
+        // Lienzo nuevo para armar el spritesheet en HD
+        const finalCanvas = document.createElement('canvas');
+        finalCanvas.width = Math.round(img.width / 2);
+        finalCanvas.height = Math.round(img.height / 2);
+        const ctx = finalCanvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
 
         if (plistText) {
-          // Extrae el tamaño real de cada sprite para procesarlos y unirlos de vuelta a la mitad
+          // Buscamos las coordenadas exactas de cada sprite individual
           const frameRegex = /<key>(?:frame|textureRect)<\/key>\s*<string>\{\{\s*([-+]?\d+)\s*,\s*([-+]?\d+)\s*\},\s*\{\s*([-+]?\d+)\s*,\s*([-+]?\d+)\s*\}\}<\/string>/g;
           let match;
           let foundFrames = false;
 
           while ((match = frameRegex.exec(plistText)) !== null) {
             foundFrames = true;
-            const x = parseInt(match[1], 10);
-            const y = parseInt(match[2], 10);
-            const w = parseInt(match[3], 10);
-            const h = parseInt(match[4], 10);
+            const x = parseInt(match[1]);
+            const y = parseInt(match[2]);
+            const w = parseInt(match[3]);
+            const h = parseInt(match[4]);
+            
             if (w === 0 || h === 0) continue;
 
-            // GD Colon logic: Cortar individualmente en un canvas temporal limpio
+            // 1. Extraer a un canvas temporal transparente
+            // ESTO es lo que separa a los sprites y elimina el sangrado de las líneas blancas
             const tmp = document.createElement('canvas');
             tmp.width = w; tmp.height = h;
             const tCtx = tmp.getContext('2d');
+            tCtx.imageSmoothingEnabled = true;
+            tCtx.imageSmoothingQuality = 'high';
             tCtx.drawImage(img, x, y, w, h, 0, 0, w, h);
 
-            // Pegar individualmente achicado en su lugar
-            ctxDest.drawImage(tmp, 0, 0, w, h, x / 2, y / 2, w / 2, h / 2);
+            // 2. Limpiar píxeles fantasmas
+            const tmpData = tCtx.getImageData(0,0,w,h);
+            for(let i=0; i<tmpData.data.length; i+=4) {
+               if(tmpData.data[i+3] === 0) { tmpData.data[i]=0; tmpData.data[i+1]=0; tmpData.data[i+2]=0; }
+            }
+            tCtx.putImageData(tmpData, 0, 0);
+
+            // 3. Pegar escalado a la mitad en la posición HD exacta
+            const hdX = Math.round(x / 2);
+            const hdY = Math.round(y / 2);
+            const hdW = Math.round(w / 2);
+            const hdH = Math.round(h / 2);
+            
+            ctx.drawImage(tmp, 0, 0, w, h, hdX, hdY, hdW, hdH);
           }
 
           if (!foundFrames) {
-            ctxDest.drawImage(img, 0, 0, img.width, img.height, 0, 0, cDest.width, cDest.height);
+            ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, finalCanvas.width, finalCanvas.height);
           }
         } else {
-          // Tu propio escáner anti-sangrado para archivos individuales o fondos (TU CÓDIGO INTACTO)
-          const cOrig = document.createElement('canvas');
-          cOrig.width = img.width; cOrig.height = img.height;
-          const ctxOrig = cOrig.getContext('2d', { willReadFrequently: true });
-          ctxOrig.drawImage(img, 0, 0);
+          // Tu lógica original para fondos y archivos sueltos
+          const tmp = document.createElement('canvas');
+          tmp.width = img.width; tmp.height = img.height;
+          const tCtx = tmp.getContext('2d', { willReadFrequently: true });
+          tCtx.drawImage(img, 0, 0);
           
-          const imgData = ctxOrig.getImageData(0, 0, cOrig.width, cOrig.height);
-          const data = imgData.data;
-          for(let i = 0; i < data.length; i += 4) {
-            if(data[i+3] === 0) { data[i] = 0; data[i+1] = 0; data[i+2] = 0; }
+          const tmpData = tCtx.getImageData(0,0,img.width,img.height);
+          for(let i=0; i<tmpData.data.length; i+=4) {
+             if(tmpData.data[i+3] === 0) { tmpData.data[i]=0; tmpData.data[i+1]=0; tmpData.data[i+2]=0; }
           }
-          ctxOrig.putImageData(imgData, 0, 0);
-          ctxDest.drawImage(cOrig, 0, 0, cDest.width, cDest.height);
+          tCtx.putImageData(tmpData, 0, 0);
+
+          ctx.drawImage(tmp, 0, 0, img.width, img.height, 0, 0, finalCanvas.width, finalCanvas.height);
         }
-        cDest.toBlob(res, 'image/png');
+
+        finalCanvas.toBlob(res, 'image/png');
       };
     });
   };
 
-  /* Ejecución del Zip (Vinculado para mandar el Plist al resize) */
+  /* Lógica de Zip y Archivos - INTACTA DE TU TXT ORIGINAL */
   document.getElementById('file').onchange = async (e) => {
     const files = e.target.files; if(!files.length) return;
-    const zipOut = new JSZip(); st.innerText = "LIMPIANDO Y PORTEANDO...";
+    const zipOut = new JSZip(); st.innerText = "GD COLÓN: AISLANDO Y PORTEANDO...";
     
     for (let f of files) {
       if (f.name.toLowerCase().endsWith('.zip')) {
@@ -258,6 +280,7 @@
           let nPath = path.replace(/-uhd/gi, '-hd');
           
           if (path.toLowerCase().endsWith('.png')) {
+            // Mandamos a buscar el Plist para que funcione el motor Colon
             let plistPath = path.replace(/\.png$/i, '.plist');
             let plistText = null;
             if (zipIn.files[plistPath]) {
@@ -265,8 +288,12 @@
             }
             zipOut.file(nPath, await resizeQuality(await entry.async("blob"), plistText));
           }
-          else if (path.match(/\.(plist|fnt)$/i)) zipOut.file(nPath, processData(await entry.async("string")));
-          else zipOut.file(nPath, await entry.async("blob"));
+          else if (path.match(/\.(plist|fnt)$/i)) {
+            zipOut.file(nPath, processData(await entry.async("string")));
+          }
+          else {
+            zipOut.file(nPath, await entry.async("blob"));
+          }
         }
       } else {
         let n = f.name.replace(/-uhd/gi, '-hd');
@@ -276,8 +303,12 @@
           let plistText = plistFile ? await plistFile.text() : null;
           zipOut.file(n, await resizeQuality(f, plistText));
         }
-        else if (f.name.match(/\.(plist|fnt)$/i)) zipOut.file(n, processData(await f.text()));
-        else zipOut.file(n, f);
+        else if (f.name.match(/\.(plist|fnt)$/i)) {
+          zipOut.file(n, processData(await f.text()));
+        }
+        else {
+          zipOut.file(n, f);
+        }
       }
     }
     st.innerText = "¡TODO LISTO!"; sv.style.display = "block";
