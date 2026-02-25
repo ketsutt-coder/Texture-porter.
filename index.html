@@ -68,7 +68,8 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
 
-    .profile-section { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
+    .profile-section { display: flex; flex-direction: column; align-items: center;
+      margin-bottom: 20px; }
     .profile-pic {
       width: 85px; height: 85px; border-radius: 50%;
       border: 3px solid var(--music-pink); object-fit: cover;
@@ -85,7 +86,8 @@
       transition: transform 0.2s;
     }
     .drop-zone:active { transform: scale(0.98); }
-    #status { font-size: 11px; color: var(--music-pink); margin-top: 20px; font-weight: 800; }
+    #status { font-size: 11px; color: var(--music-pink); margin-top: 20px;
+      font-weight: 800; }
     #saveBtn {
       background: var(--music-pink); color: #ffffff; border: none;
       padding: 18px; border-radius: 24px; 
@@ -94,7 +96,8 @@
 
     .mini-player {
       margin-top: 20px; background: var(--glass); border-radius: 30px;
-      padding: 18px 25px; width: 85%; max-width: 350px; border: 1px solid var(--border);
+      padding: 18px 25px;
+      width: 85%; max-width: 350px; border: 1px solid var(--border);
       display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(35px) saturate(180%);
       -webkit-backdrop-filter: blur(35px) saturate(180%);
     }
@@ -102,12 +105,14 @@
     .btn-svg svg { fill: var(--text); width: 22px; height: 22px; }
     #btnPlay svg { width: 32px; height: 32px; }
 
-    .social-bar { margin-top: 20px; display: flex; gap: 12px; width: 85%; max-width: 350px; }
+    .social-bar { margin-top: 20px;
+      display: flex; gap: 12px; width: 85%; max-width: 350px; }
     .social-btn {
       flex: 1;
       background: var(--glass); border: 1px solid var(--border); padding: 14px; border-radius: 22px;
       text-decoration: none; color: var(--text); font-size: 13px; font-weight: 700;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
+      display: flex;
+      align-items: center; justify-content: center; gap: 8px;
     }
   </style>
 </head>
@@ -154,12 +159,11 @@
 </div>
 
 <script>
-  /* Interfaz y Audio (Restaurados de tu código) [cite: 1, 37-43] */
+  /* Interfaz y Audio (TU CÓDIGO ORIGINAL INTACTO) */
   const body = document.getElementById('mainBody'); const audio = document.getElementById('audio');
   const st = document.getElementById('status'); const sv = document.getElementById('saveBtn');
   const mIco = document.getElementById('m-ico'); const pIco = document.getElementById('p-ico');
   const pBtn = document.getElementById('btnPlay');
-  
   document.getElementById('themeBtn').onclick = () => body.classList.toggle('dark-mode');
   function playMusic() { audio.play().then(() => pIco.setAttribute('d', "M6 19h4V5H6v14zm8-14v14h4V5h-4z")).catch(()=>{}); }
   pBtn.onclick = () => { if(audio.paused) playMusic(); else { audio.pause(); pIco.setAttribute('d', "M8 5v14l11-7z"); } };
@@ -169,7 +173,7 @@
   };
   document.addEventListener('click', () => { if(audio.paused && audio.currentTime === 0) playMusic(); }, { once: true });
 
-  /* CORRECCIÓN MATEMÁTICA Y ALPHA BLEEDING (Restaurados y mejorados) [cite: 1, 44-53] */
+  /* Matemáticas de Coordenadas Originales */
   const processData = (txt) => {
     let res = txt.replace(/\{\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*\}/g, (m, x, y) => `{${parseFloat(x)/2},${parseFloat(y)/2}}`);
     const tags = ['x', 'y', 'width', 'height', 'xoffset', 'yoffset', 'xadvance', 'size', 'base', 'lineHeight', 'scaleW', 'scaleH'];
@@ -180,79 +184,200 @@
     return res.replace(/-uhd/gi, '-hd');
   };
 
-  const resizeQuality = async (blob, plistText = null) => {
-    return new Promise((res) => {
-      const img = new Image(); img.src = URL.createObjectURL(blob);
+  /* 🔥 MOTOR DE EMPAQUETADO GD COLÓN: SEPARA SPRITES Y CREA NUEVA HOJA HD 🔥 */
+  const smartPort = async (imgBlob, plistText) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = URL.createObjectURL(imgBlob);
       img.onload = () => {
-        const cDest = document.createElement('canvas');
-        cDest.width = Math.floor(img.width / 2); cDest.height = Math.floor(img.height / 2);
-        const ctxDest = cDest.getContext('2d');
-        ctxDest.imageSmoothingEnabled = true; ctxDest.imageSmoothingQuality = 'high';
-
-        if (plistText) {
-          /* MÉTODO GD COLON IN-PLACE: Recorta y pega por separado [cite: 1, 56-58] */
-          const frameRegex = /<key>(?:frame|textureRect)<\/key>\s*<string>\{\{\s*([-+]?\d+)\s*,\s*([-+]?\d+)\s*\},\s*\{\s*([-+]?\d+)\s*,\s*([-+]?\d+)\s*\}\}<\/string>/g;
-          let match;
-          while((match = frameRegex.exec(plistText)) !== null) {
-            const [x, y, w, h] = [parseInt(match[1]), parseInt(match[2]), parseInt(match[3]), parseInt(match[4])];
-            if (w === 0 || h === 0) continue;
-            ctxDest.drawImage(img, x, y, w, h, x/2, y/2, w/2, h/2);
-          }
-        } else {
-          /* REDIMENSIÓN GLOBAL CON ESCÁNER ANTI-SANGRADO [cite: 1, 49-53] */
-          const cOrig = document.createElement('canvas');
-          cOrig.width = img.width; cOrig.height = img.height;
-          const ctxOrig = cOrig.getContext('2d', { willReadFrequently: true });
-          ctxOrig.drawImage(img, 0, 0);
-          const imgData = ctxOrig.getImageData(0, 0, cOrig.width, cOrig.height);
-          const data = imgData.data;
-          for(let i = 0; i < data.length; i += 4) {
-            if(data[i+3] === 0) { data[i]=0; data[i+1]=0; data[i+2]=0; }
-          }
-          ctxOrig.putImageData(imgData, 0, 0);
-          ctxDest.drawImage(cOrig, 0, 0, cDest.width, cDest.height);
+        if (!plistText) {
+          // Si no hay Plist (ej. fondos), reescalar normal con alta calidad
+          const c = document.createElement('canvas');
+          c.width = Math.floor(img.width / 2); c.height = Math.floor(img.height / 2);
+          const ctx = c.getContext('2d');
+          ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, c.width, c.height);
+          c.toBlob(b => resolve({ blob: b, plist: null }), 'image/png');
+          return;
         }
-        cDest.toBlob(res, 'image/png');
+
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(plistText, "text/xml");
+        
+        const framesDict = Array.from(xmlDoc.querySelectorAll("dict")).find(d => d.previousElementSibling && d.previousElementSibling.textContent === "frames");
+        if (!framesDict) {
+            const c = document.createElement('canvas');
+            c.width = Math.floor(img.width / 2); c.height = Math.floor(img.height / 2);
+            c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+            c.toBlob(b => resolve({ blob: b, plist: null }), 'image/png');
+            return;
+        }
+
+        const getValNode = (node, key) => {
+            for (let i=0; i<node.children.length; i++) {
+                if (node.children[i].textContent === key) return node.children[i+1];
+            }
+            return null;
+        };
+
+        const sprites = [];
+        const frameKeys = Array.from(framesDict.children).filter(el => el.tagName === 'key');
+        
+        for (let keyNode of frameKeys) {
+            const name = keyNode.textContent;
+            const dataNode = keyNode.nextElementSibling;
+            if (!dataNode || dataNode.tagName !== 'dict') continue;
+
+            let rectStr = getValNode(dataNode, "textureRect")?.textContent || getValNode(dataNode, "frame")?.textContent;
+            if (!rectStr) continue;
+
+            const rect = rectStr.match(/-?\d+/g).map(Number);
+            if (rect.length < 4) continue;
+            sprites.push({ name, dataNode, x: rect[0], y: rect[1], w: rect[2], h: rect[3] });
+        }
+
+        // Armamos un lienzo HD nuevo empacando cada sprite separado (evita cortes y líneas)
+        sprites.sort((a, b) => b.h - a.h);
+        const PADDING = 2;
+        const MAX_WIDTH = Math.ceil(img.width / 2);
+        const outCanvas = document.createElement("canvas");
+        outCanvas.width = MAX_WIDTH;
+        outCanvas.height = Math.ceil(img.height / 2); 
+        const ctx = outCanvas.getContext("2d");
+        ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+
+        let curX = 2, curY = 2, rowH = 0;
+
+        sprites.forEach(s => {
+            let scaledW = Math.round(s.w / 2);
+            let scaledH = Math.round(s.h / 2);
+            if (scaledW === 0 || scaledH === 0) return;
+
+            if (curX + scaledW + PADDING > MAX_WIDTH) { curX = 2; curY += rowH + PADDING; rowH = 0; }
+
+            // Recorta el sprite UHD de la imagen original y lo pega en el HD
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = scaledW; tempCanvas.height = scaledH;
+            const tCtx = tempCanvas.getContext('2d');
+            tCtx.imageSmoothingEnabled = true; tCtx.imageSmoothingQuality = 'high';
+            tCtx.drawImage(img, s.x, s.y, s.w, s.h, 0, 0, scaledW, scaledH);
+            ctx.drawImage(tempCanvas, curX, curY);
+
+            // Actualiza las posiciones en el XML
+            const rectNode = getValNode(s.dataNode, "textureRect") || getValNode(s.dataNode, "frame");
+            if (rectNode) rectNode.textContent = `{{${curX},${curY}},{${scaledW},${scaledH}}}`;
+
+            const updateSizeNode = (key) => {
+                const node = getValNode(s.dataNode, key);
+                if (node) {
+                    const match = node.textContent.match(/-?\d+/g);
+                    if (match && match.length >= 2) node.textContent = `{${Math.round(Number(match[0])/2)},${Math.round(Number(match[1])/2)}}`;
+                }
+            };
+            updateSizeNode("spriteOffset"); updateSizeNode("offset");
+            updateSizeNode("spriteSize"); updateSizeNode("sourceSize");
+
+            const colorRectNode = getValNode(s.dataNode, "sourceColorRect");
+            if (colorRectNode) {
+                const match = colorRectNode.textContent.match(/-?\d+/g);
+                if (match && match.length >= 4) {
+                    colorRectNode.textContent = `{{${Math.round(Number(match[0])/2)},${Math.round(Number(match[1])/2)}},{${Math.round(Number(match[2])/2)},${Math.round(Number(match[3])/2)}}}`;
+                }
+            }
+
+            curX += scaledW + PADDING; rowH = Math.max(rowH, scaledH);
+        });
+
+        const finalHeight = curY + rowH + PADDING;
+        const croppedCanvas = document.createElement("canvas");
+        croppedCanvas.width = outCanvas.width; croppedCanvas.height = finalHeight;
+        croppedCanvas.getContext("2d").drawImage(outCanvas, 0, 0);
+
+        const metaDict = Array.from(xmlDoc.querySelectorAll("dict")).find(d => d.previousElementSibling && d.previousElementSibling.textContent === "metadata");
+        if (metaDict) {
+            const sizeNode = getValNode(metaDict, "size");
+            if (sizeNode) sizeNode.textContent = `{${outCanvas.width},${finalHeight}}`;
+            const texNode = getValNode(metaDict, "textureFileName");
+            if (texNode) texNode.textContent = texNode.textContent.replace(/-uhd/gi, '-hd');
+            const realNode = getValNode(metaDict, "realTextureFileName");
+            if (realNode) realNode.textContent = realNode.textContent.replace(/-uhd/gi, '-hd');
+        }
+
+        const outPlist = new XMLSerializer().serializeToString(xmlDoc);
+        croppedCanvas.toBlob(b => resolve({ blob: b, plist: outPlist }), 'image/png');
       };
     });
   };
 
-  /* PROCESAMIENTO ZIP E INDIVIDUAL (Restaurado) [cite: 1, 54-61] */
+  /* Ejecución del Zip Integrado con el Motor GD Colón */
   document.getElementById('file').onchange = async (e) => {
     const files = Array.from(e.target.files); if(!files.length) return;
-    const zipOut = new JSZip(); st.innerText = "LIMPIANDO Y PORTEANDO...";
+    const zipOut = new JSZip(); st.innerText = "SEPARANDO Y ENCOGIENDO...";
     
     for (let f of files) {
       if (f.name.toLowerCase().endsWith('.zip')) {
         const zipIn = await JSZip.loadAsync(f);
-        const processedPlists = new Set();
-        for (let path in zipIn.files) {
-          const entry = zipIn.files[path]; if(entry.dir || path.includes('__MACOSX')) continue;
+        const entries = Object.keys(zipIn.files).filter(path => !zipIn.files[path].dir && !path.includes('__MACOSX'));
+        
+        for (let path of entries) {
           let nPath = path.replace(/-uhd/gi, '-hd');
           if (path.toLowerCase().endsWith('.png')) {
-            const plistPath = path.replace('.png', '.plist');
-            const plistText = zipIn.files[plistPath] ? await zipIn.files[plistPath].async("string") : null;
-            zipOut.file(nPath, await resizeQuality(await entry.async("blob"), plistText));
-          } else if (path.match(/\.(plist|fnt)$/i)) {
-            zipOut.file(nPath, processData(await entry.async("string")));
-          } else { zipOut.file(nPath, await entry.async("blob")); }
+            const plistPath = path.replace(/\.png$/i, '.plist');
+            if (zipIn.files[plistPath]) {
+              const pText = await zipIn.files[plistPath].async("string");
+              const res = await smartPort(await zipIn.files[path].async("blob"), pText);
+              if (res.plist) {
+                zipOut.file(nPath, res.blob);
+                zipOut.file(plistPath.replace(/-uhd/gi, '-hd'), res.plist);
+              } else {
+                zipOut.file(nPath, res.blob);
+              }
+            } else {
+              const res = await smartPort(await zipIn.files[path].async("blob"), null);
+              zipOut.file(nPath, res.blob);
+            }
+          } else if (path.match(/\.(fnt|plist)$/i)) {
+             const pngPath = path.replace(/\.plist$/i, '.png');
+             if (!zipIn.files[pngPath]) {
+                 zipOut.file(nPath, processData(await zipIn.files[path].async("string")));
+             }
+          } else {
+             zipOut.file(nPath, await zipIn.files[path].async("blob"));
+          }
         }
       } else {
-        let n = f.name.replace(/-uhd/gi, '-hd');
-        if (f.name.toLowerCase().endsWith('.png')) {
-          const plistFile = files.find(p => p.name === f.name.replace('.png', '.plist'));
-          const pText = plistFile ? await plistFile.text() : null;
-          zipOut.file(n, await resizeQuality(f, pText));
-        } else if (f.name.match(/\.(plist|fnt)$/i)) {
-          zipOut.file(n, processData(await f.text()));
-        } else { zipOut.file(n, f); }
+         let n = f.name.replace(/-uhd/gi, '-hd');
+         if (f.name.toLowerCase().endsWith('.png')) {
+           const plistName = f.name.replace(/\.png$/i, '.plist');
+           const plistFile = files.find(p => p.name === plistName);
+           if (plistFile) {
+             const pText = await plistFile.text();
+             const res = await smartPort(f, pText);
+             if (res.plist) {
+               zipOut.file(n, res.blob);
+               zipOut.file(plistName.replace(/-uhd/gi, '-hd'), res.plist);
+             } else {
+               zipOut.file(n, res.blob);
+             }
+           } else {
+             const res = await smartPort(f, null);
+             zipOut.file(n, res.blob);
+           }
+         } else if (f.name.match(/\.(fnt|plist)$/i)) {
+             const pngName = f.name.replace(/\.plist$/i, '.png');
+             if (!files.some(x => x.name === pngName)) {
+                 zipOut.file(n, processData(await f.text()));
+             }
+         } else {
+             zipOut.file(n, f);
+         }
       }
     }
     st.innerText = "¡TODO LISTO!"; sv.style.display = "block";
     sv.onclick = async () => {
       const content = await zipOut.generateAsync({type:"blob"});
       const a = document.createElement("a"); a.href = URL.createObjectURL(content);
-      a.download = "TexturePack_Perfect_By_Ketsu.zip"; a.click();
+      a.download = "TexturePack_GDColon_By_Ketsu.zip"; a.click();
     };
   };
 </script>
